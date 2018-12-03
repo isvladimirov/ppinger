@@ -18,7 +18,7 @@ package PDraw
     use POSIX qw(strftime);
     use Switch;
     use strict;
-    
+
     sub new
     {
         my($class) = @_;
@@ -29,7 +29,7 @@ package PDraw
         bless $self, $class;
         return $self;
     }
-    
+
     sub addHeader
     {
         my($self, $title, $refresh) = @_;
@@ -49,7 +49,7 @@ package PDraw
         print "Page loaded at $now_string</header>\n";
         return 1;
     }
-    
+
     sub addFooter
     {
         my($self, $status) = @_;
@@ -58,7 +58,7 @@ package PDraw
         print "</html>\n";
         return 1;
     }
-    
+
     sub openFolders
     {
         my($self, $need_edit) = @_;
@@ -74,7 +74,7 @@ package PDraw
         print "<ul id='folderList'>\n";
         return 1;
     }
-    
+
     sub addFolder
     {
         my($self, $need_edit, $name, $id) = @_;
@@ -86,7 +86,7 @@ package PDraw
         print "<li id='folderItem'><img width='16' src='share/folder-green.svg'>$editButtons $name</li>\n";
         return 1;
     }
-    
+
     sub closeFolders
     {
         my($self) = @_;
@@ -94,7 +94,7 @@ package PDraw
         print "</nav>\n";
         return 1;
     }
-    
+
     sub openHosts
     {
         my($self, $need_edit) = @_;
@@ -115,7 +115,7 @@ package PDraw
         print "</tr>\n";
         return 1;
     }
-    
+
     sub addHost
     {
         my($self, $need_edit, $name, $id, $status, $reply, $ltt, $lastStatus, $comment, $statusChanged) = @_;
@@ -140,7 +140,7 @@ package PDraw
         print "<tr>\n";
         return 1;
     }
-    
+
     sub closeHosts
     {
         #my($self) = @_;

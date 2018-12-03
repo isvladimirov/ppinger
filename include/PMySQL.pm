@@ -74,7 +74,7 @@ package PMySQL
     # 10 - last_status
     # 11 - status_changed
     # 12 - comment
-    
+
     sub getHostList
     {
         my($self, $parent, $status) = @_;
@@ -88,5 +88,13 @@ package PMySQL
         $self->{ITEMS_COUNT} = $queryHash->execute;
         return $queryHash;
     }
+
+    # Returns number of items in last SQL query.
+    sub getItemsCount
+    {
+        my($self) = @_;
+        return $self->{ITEMS_COUNT};
+    }
+
 }
 1;
