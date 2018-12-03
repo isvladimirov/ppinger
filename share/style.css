@@ -1,0 +1,121 @@
+body {
+    display: grid;
+    grid-template-areas:
+    "header header"
+    "nav article"
+    "nav footer";
+    grid-template-rows: 80px 1fr 37px;
+    grid-template-columns: 200px 1fr;
+    grid-gap: 5px;
+    height: 100vh;
+    margin: 0;
+    text-decoration: none;
+}
+header, nav, article, footer {
+    padding: 10px;
+    background: #D9D8D9;
+}
+#pageHeader {
+    grid-area: header;
+    padding: 10px;
+}
+#pageFooter {
+    grid-area: footer;
+    padding: 10px;
+}
+#pageNav {
+    grid-area: nav;
+    padding: 0;
+}
+#pageHosts {
+    grid-area: article;
+    padding: 0;
+}
+#mainTable {
+    width: 100%;
+    border: 0;
+    border-spacing: 1px;
+    background: #F0F0F0;
+}
+#mainTableHeader {
+    text-align: center;
+    font-weight: bold;
+    border: 0;
+    background-color: #56A8FF;
+}
+#mainTableHeaderAdd {
+    width: 20px;
+}
+#mainTableHeaderHost {
+    text-align: left;
+    padding-left: 3px;
+}
+#mainTableHeaderStatus {
+    width: 100px;
+}
+#mainTableHeaderReply {
+    width: 70px;
+}
+#mainTableHeaderLTT {
+    width: 150px;
+}
+#mainTableHeaderLS {
+    width: 100px;
+}
+#mainTableHeaderCom {
+    text-align: left;
+    width: 300px;
+    padding-left: 3px;
+}
+#mainTableHeaderSC {
+    width: 150px;
+}
+#mainTableRow {
+    text-align: center;
+    border: 0;
+    margin: 10px;
+    background-color: #D9D8D9;
+}
+#mainTableRowBad {
+    text-align: center;
+    border: 0;
+    background-color: #FF2020;
+}
+#mainTableRowDisabled {
+    text-align: center;
+    border: 0;
+    background-color: #999999;
+}
+#mainTableDataHost {
+    text-align: left;
+    padding-left: 3px;
+}
+#mainTableComment {
+    text-align: left;
+    padding-left: 3px;
+}
+#folderHeader {
+    text-align: left;
+    font-weight: bold;
+    border: 0;
+    margin: 1px;
+    padding-top: 1px;
+    padding-bottom: 1px;
+    padding-left: 3px;
+    padding-right: 1px;
+    background-color: #56A8FF;
+}
+#folderList {
+    text-align: left;
+    border: 0;
+    margin: 1px;
+    padding: 1px;
+}
+#folderItem {
+    text-align: left;
+    vertical-align: middle;
+    padding: 1px;
+}
+img {
+    vertical-align: middle;
+}
