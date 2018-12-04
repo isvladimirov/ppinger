@@ -77,13 +77,18 @@ package PDraw
 
     sub addFolder
     {
-        my($self, $need_edit, $name, $id) = @_;
+        my($self, $need_edit, $name, $id, $level, $isLast) = @_;
         my $editButtons = "";
+        my $prefix= "";
+        for (my $i=0; $i<$level; $i++)
+        {
+            $prefix.="->";
+        }
         if ($need_edit)
         {
             $editButtons = " <img width='16' src='share/edit-text-frame-update.svg'>";
         }
-        print "<li id='folderItem'><img width='16' src='share/folder-green.svg'>$editButtons $name</li>\n";
+        print "<li id='folderItem'>$prefix<img width='16' src='share/folder-green.svg'>$editButtons $name</li>\n";
         return 1;
     }
 

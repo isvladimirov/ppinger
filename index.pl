@@ -14,6 +14,9 @@ use Config::IniFiles;
 use Switch;
 use strict;
 
+# Recursive function for drawing folder tree
+sub drawFolderField;
+
 my $config = Config::IniFiles->new( -file => "etc/ppinger.cfg" );
 my $queryCGI = CGI->new();
 # Try to open database
@@ -23,6 +26,9 @@ my $db = PMySQL->new(
     $config->val('SQL', 'db_pass'),
     $config->val('SQL', 'db_name')
 );
+
+# Array for fetching MySQL data
+my @row = ();
 
 # Open output
 my $ui = PDraw->new();
@@ -62,20 +68,25 @@ switch ($action)
 $ui->addHeader($title, $refresh);
 
 $ui->openFolders($editMode);
-my @row = ();
-my $sth = $db->getFolderList(0);
-for (my $i=1; $i <= $db->{ITEMS_COUNT}; $i++)
-{
-    @row = $sth->fetchrow_array;
-    $ui->addFolder($editMode, $row[1], $row[0]);
-}
-$sth->finish();
+
+
+
+drawFolderField($db, $ui, 1, 0);
+
+#my $sth = $db->getFolderList(0);
+#for (my $i=1; $i <= $db->getItemsCount; $i++)
+#{
+#    @row = $sth->fetchrow_array;
+#    $ui->addFolder($editMode, $row[1], $row[0]);
+#}
+#$sth->finish();
+
 $ui->closeFolders();
 
 $ui->openHosts($editMode);
 
-$sth = $db->getHostList(0);
-for (my $i=1; $i <= $db->{ITEMS_COUNT}; $i++)
+my $sth = $db->getHostList(0);
+for (my $i=1; $i <= $db->getItemsCount; $i++)
 {
     @row = $sth->fetchrow_array;
     switch ($row[3])
@@ -95,4 +106,19 @@ $ui->addFooter("PPinger v0.2 | Разрабатываемая версия");
 # Close database
 $db->DESTROY;
 
+# End of main function
 1;
+
+sub drawFolderField
+{
+    my ($sourceDB, $destinationUI, $parent, $level) = @_;
+    my @row = ();
+    my $sth = $sourceDB->getFolderList($parent);
+    while (@row = $sth->fetchrow_array)
+    {
+        $destinationUI->addFolder($editMode, $row[1], $row[0], $level);
+        drawFolderField($sourceDB, $destinationUI, $row[0], $level+1);
+    }
+    $sth->finish();
+    return 1;
+}

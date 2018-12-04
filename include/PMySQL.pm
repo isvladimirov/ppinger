@@ -46,7 +46,17 @@ package PMySQL
     sub getFolderList
     {
         my($self, $parent) = @_;
-        my $query = "SELECT id,name FROM folders WHERE parent_id=$parent ORDER BY name;";
+        my $query;
+        if ($parent)
+        {
+            # If a parent is set return its children only
+            $query = "SELECT id,name FROM folders WHERE parent_id=$parent ORDER BY name;";
+        }
+        else
+        {
+            # If there is no parent return all folder
+            $query = "SELECT id,name FROM folders ORDER BY name;";
+        }
         my $queryHash = $dbh->prepare($query);
         $self->{ITEMS_COUNT} = $queryHash->execute;
         return $queryHash;
