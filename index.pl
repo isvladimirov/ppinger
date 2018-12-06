@@ -61,30 +61,20 @@ switch ($action)
         # Draw main form
         $action = "view";
         $refresh = $config->val('Global', 'refresh');
+        $title .= " :: View mode";
     }
 }
 
 # Draw header
 $ui->addHeader($title, $refresh);
 
+# Draw folders
 $ui->openFolders($editMode);
-
-
-
 drawFolderField($db, $ui, 1, 0);
-
-#my $sth = $db->getFolderList(0);
-#for (my $i=1; $i <= $db->getItemsCount; $i++)
-#{
-#    @row = $sth->fetchrow_array;
-#    $ui->addFolder($editMode, $row[1], $row[0]);
-#}
-#$sth->finish();
-
 $ui->closeFolders();
 
+# Draw hosts
 $ui->openHosts($editMode);
-
 my $sth = $db->getHostList(0);
 for (my $i=1; $i <= $db->getItemsCount; $i++)
 {
@@ -101,6 +91,7 @@ for (my $i=1; $i <= $db->getItemsCount; $i++)
 $sth->finish();
 $ui->closeHosts();
 
+# Draw footer
 $ui->addFooter("PPinger v0.2 | Разрабатываемая версия");
 
 # Close database
