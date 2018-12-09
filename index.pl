@@ -14,6 +14,8 @@ use Config::IniFiles;
 use Switch;
 use strict;
 
+use constant VERSION => 0.3;
+
 # Recursive function for drawing folder tree
 sub drawFolderField;
 
@@ -36,7 +38,9 @@ my $ui = PDraw->new();
 my $title = $config->val('Global', 'title');
 my $refresh = 0;
 my $action = $queryCGI->param('action');
+my $folderId = $queryCGI->param('folder_id');
 my $editMode = 0;
+
 switch ($action)
 {
     case "edit"
@@ -65,12 +69,15 @@ switch ($action)
     }
 }
 
+# Validate $folderId
+$folderId =~ /^\d+?$/ or $folderId = 0;
+
 # Draw header
 $ui->addHeader($title, $refresh);
 
 # Draw folders
 $ui->openFolders($editMode);
-drawFolderField($db, $ui, 1, 0);
+drawFolderField($db, $ui, -1, 0, $folderId);
 $ui->closeFolders();
 
 # Draw hosts
@@ -92,7 +99,7 @@ $sth->finish();
 $ui->closeHosts();
 
 # Draw footer
-$ui->addFooter("PPinger v0.2 | Разрабатываемая версия");
+$ui->addFooter("PPinger ".(VERSION)." | Разрабатываемая версия | folderId: $folderId");
 
 # Close database
 $db->DESTROY;
@@ -102,13 +109,13 @@ $db->DESTROY;
 
 sub drawFolderField
 {
-    my ($sourceDB, $destinationUI, $parent, $level) = @_;
+    my ($sourceDB, $destinationUI, $parent, $level, $folderId) = @_;
     my @row = ();
     my $sth = $sourceDB->getFolderList($parent);
     while (@row = $sth->fetchrow_array)
     {
-        $destinationUI->addFolder($editMode, $row[1], $row[0], $level);
-        drawFolderField($sourceDB, $destinationUI, $row[0], $level+1);
+        $destinationUI->addFolder($editMode, $row[1], $row[0], $level, 0, $folderId);
+        drawFolderField($sourceDB, $destinationUI, $row[0], $level+1, $folderId);
     }
     $sth->finish();
     return 1;

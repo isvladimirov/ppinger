@@ -65,11 +65,15 @@ package PDraw
         print "<nav id='pageNav'>\n";
         if ($need_edit)
         {
-            print "<div id='folderHeader'><img width='16' src='share/fork.svg'> Folders</div>\n";
+            print "<div id='folderHeader'>";
+            # Link to create new folder
+            print "<a href='./index.pl?action=edit_folder'><img width='16' src='share/fork.svg'></a>";
+            print "<a href='./index.pl'>Folders</a></div>\n";
         }
         else
         {
-            print "<div id='folderHeader'>Folders</div>\n";
+            # Link to default page
+            print "<div id='folderHeader'><a href='./index.pl'>Folders</a></div>\n";
         }
         print "<ul id='folderList'>\n";
         return 1;
@@ -77,7 +81,7 @@ package PDraw
 
     sub addFolder
     {
-        my($self, $need_edit, $name, $id, $level, $isLast) = @_;
+        my($self, $need_edit, $name, $id, $level, $isLast, $checked_id) = @_;
         my $editButtons = "";
         my $prefix= "";
         for (my $i=0; $i<$level; $i++)
@@ -86,9 +90,21 @@ package PDraw
         }
         if ($need_edit)
         {
-            $editButtons = " <img width='16' src='share/edit-text-frame-update.svg'>";
+            # Link to edit current folder
+            $editButtons = "<a href='./index.pl?action=edit_folder&folder_id=$id'>";
+            $editButtons .= "<img width='16' src='share/edit-text-frame-update.svg'></a>";
         }
-        print "<li id='folderItem'>$prefix<img width='16' src='share/folder-green.svg'>$editButtons $name</li>\n";
+        if ($id==$checked_id)
+        {
+            print "<li id='folderItemChecked'>$prefix";
+        }
+        else
+        {
+            print "<li id='folderItem'>$prefix";
+        }
+        print "<img width='16' src='share/folder-green.svg'>$editButtons";
+        # Link to show current folder
+        print "<a href='index.pl?folder_id=$id'>$name</a></li>\n";
         return 1;
     }
 

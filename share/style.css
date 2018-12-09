@@ -116,6 +116,16 @@ header, nav, article, footer {
     vertical-align: middle;
     padding: 1px;
 }
+#folderItemChecked {
+    text-align: left;
+    vertical-align: middle;
+    padding: 1px;
+    font-weight: bold;
+}
 img {
     vertical-align: middle;
+}
+a {
+    text-decoration: none;
+    color: black;
 }
