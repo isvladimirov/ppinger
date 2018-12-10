@@ -43,10 +43,17 @@ package PDraw
         if ($refresh) { print "<meta http-equiv='refresh' content=$refresh>\n"; }
         print "</head>\n";
         print "<body>\n";
-        print "<header id='pageHeader'>$title<br>\n";
+        print "<header id='pageHeader'>\n";
+        print "<div id='pageHeaderLeft'>\n";
+        print "$title<br>\n";
         print "Running on " . hostname() . "<br>\n";
         my $now_string = strftime "%a %e %b %Y %H:%M:%S", localtime;
-        print "Page loaded at $now_string</header>\n";
+        print "Page loaded at $now_string\n";
+        print "</div>\n";
+        print "<div id='pageHeaderRight'>\n";
+        print "<a href='./index.pl?action=edit'><img width='32' src='share/edit-text-frame-update.svg' alt='Enter edit mode'></a>\n";
+        print "</div>\n";
+        print "</header>\n";
         return 1;
     }
 
@@ -67,7 +74,8 @@ package PDraw
         {
             print "<div id='folderHeader'>";
             # Link to create new folder
-            print "<a href='./index.pl?action=edit_folder'><img width='16' src='share/fork.svg'></a>";
+            print "<a href='./index.pl?action=edit_folder'>";
+            print "<img width='16' src='share/fork.svg' alt='Add folder'></a>";
             print "<a href='./index.pl'>Folders</a></div>\n";
         }
         else
@@ -86,13 +94,17 @@ package PDraw
         my $prefix= "";
         for (my $i=0; $i<$level; $i++)
         {
-            $prefix.="->";
+            $prefix.="<img width='8' src='share/level.svg' alt=''>";
+        }
+        if ($prefix)
+        {
+            $prefix.="<img width='12' src='share/arrow-forward.svg' alt=''>";
         }
         if ($need_edit)
         {
             # Link to edit current folder
             $editButtons = "<a href='./index.pl?action=edit_folder&folder_id=$id'>";
-            $editButtons .= "<img width='16' src='share/edit-text-frame-update.svg'></a>";
+            $editButtons .= "<img width='16' src='share/edit-text-frame-update.svg' alt='Edit this folder'></a>";
         }
         if ($id==$checked_id)
         {
@@ -164,8 +176,25 @@ package PDraw
 
     sub closeHosts
     {
-        #my($self) = @_;
         print "</table>\n";
+        print "</article>\n";
+        return 1;
+    }
+    
+    # Draws folder edit form
+    sub editFolder
+    {
+        my($self, $id, $name, $parentId) = @_;
+        print "<article id='pageHosts'>\n";
+        print "<form action='./write.pl?folder_id=$id' method='post'>\n";
+        print "Folder name: <input type='text' value='$name'><br />\n";
+        print "Folder parent:\n";
+        print "<select name='new_parent_name'>\n";
+        print "<option>Example parent</option>\n";
+        print "</select><br />\n";
+        print "<input type='submit' value='Save'>\n";
+        print "<input type='button' value='Cancel'>\n";
+        print "</form>\n";
         print "</article>\n";
         return 1;
     }

@@ -19,6 +19,14 @@ header, nav, article, footer {
     grid-area: header;
     padding: 10px;
 }
+#pageHeaderLeft {
+    float: left;
+    padding: 0;
+}
+#pageHeaderRight {
+    float: right;
+    padding: 0;
+}
 #pageFooter {
     grid-area: footer;
     padding: 10px;

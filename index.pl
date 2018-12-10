@@ -53,11 +53,13 @@ switch ($action)
     case "edit_folder"
     {
         $action = "edit_folder";
+        $editMode = 1;
         $title = $title . " :: Edit folder";
     }
     case "edit_host"
     {
         $action = "edit_host";
+        $editMode = 1;
         $title = $title . " :: Edit host";
     }
     else
@@ -80,23 +82,34 @@ $ui->openFolders($editMode);
 drawFolderField($db, $ui, -1, 0, $folderId);
 $ui->closeFolders();
 
-# Draw hosts
-$ui->openHosts($editMode);
-my $sth = $db->getHostList(0);
-for (my $i=1; $i <= $db->getItemsCount; $i++)
+switch ($action)
 {
-    @row = $sth->fetchrow_array;
-    switch ($row[3])
+    case "edit_folder"
     {
-        case 1 { $row[3] = "unknown"; }
-        case 2 { $row[3] = "alive"; }
-        case 3 { $row[3] = "down"; }
-        case 4 { $row[3] = "disabled"; }
+        # Draw edit form for a folder
+        $ui->editFolder($folderId, "Example folder name", 0);
     }
-    $ui->addHost($editMode, $row[1], $row[0], $row[3], $ row[4], $row[9], $row[10], $row[12], $row[11]);
+    else
+    {
+        # Draw hosts
+        $ui->openHosts($editMode);
+        my $sth = $db->getHostList(0);
+        for (my $i=1; $i <= $db->getItemsCount; $i++)
+        {
+            @row = $sth->fetchrow_array;
+            switch ($row[3])
+            {
+                case 1 { $row[3] = "unknown"; }
+                case 2 { $row[3] = "alive"; }
+                case 3 { $row[3] = "down"; }
+                case 4 { $row[3] = "disabled"; }
+            }
+            $ui->addHost($editMode, $row[1], $row[0], $row[3], $ row[4], $row[9], $row[10], $row[12], $row[11]);
+        }
+        $sth->finish();
+        $ui->closeHosts();
+    }
 }
-$sth->finish();
-$ui->closeHosts();
 
 # Draw footer
 $ui->addFooter("PPinger ".(VERSION)." | Разрабатываемая версия | folderId: $folderId");
