@@ -57,6 +57,7 @@ package PDraw
         return 1;
     }
 
+    Draws footer and closes html page
     sub addFooter
     {
         my($self, $status) = @_;
