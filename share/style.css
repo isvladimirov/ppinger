@@ -43,7 +43,7 @@ header, nav, article, footer {
     width: 100%;
     border: 0;
     border-spacing: 1px;
-    background: #F0F0F0;
+    /*background: #F0F0F0;*/
 }
 #mainTableHeader {
     text-align: center;
@@ -82,12 +82,12 @@ header, nav, article, footer {
     text-align: center;
     border: 0;
     margin: 10px;
-    background-color: #D9D8D9;
+    background-color: rgba(0, 204, 0, 0.27);
 }
 #mainTableRowBad {
     text-align: center;
     border: 0;
-    background-color: #FF2020;
+    background-color: rgba(242, 30, 30, 0.75);
 }
 #mainTableRowDisabled {
     text-align: center;
@@ -130,10 +130,17 @@ header, nav, article, footer {
     padding: 1px;
     font-weight: bold;
 }
-img {
-    vertical-align: middle;
+#formEditFolder {
+    margin: auto;
 }
 a {
     text-decoration: none;
     color: black;
 }
+h1 {
+    text-align: center;
+}
+img {
+    vertical-align: middle;
+}
+

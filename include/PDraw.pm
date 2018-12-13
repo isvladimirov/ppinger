@@ -185,16 +185,20 @@ package PDraw
     sub editFolder
     {
         my($self, $id, $name, $parentId) = @_;
+        $id or $id="New";
         print "<article id='pageHosts'>\n";
+        print "<h1>Edit folder</h1>\n";
         print "<form action='./write.pl?folder_id=$id' method='post'>\n";
-        print "Folder name: <input type='text' value='$name'><br />\n";
-        print "Folder parent:\n";
-        print "<select name='new_parent_name'>\n";
+        print "<table id='formEditFolder'>\n";
+        print "<tr><td>Folder name:</td><td><input type='text' value='$name'></td></tr>\n";
+        print "<tr><td>Folder ID:</td><td>$id</td></tr>\n";
+        print "<tr><td>Folder parent:</td>\n";
+        print "<td><select name='new_parent_name'>\n";
         print "<option>Example parent</option>\n";
-        print "</select><br />\n";
-        print "<input type='submit' value='Save'>\n";
-        print "<input type='button' value='Cancel'>\n";
-        print "</form>\n";
+        print "</select></td><tr>\n";
+        print "<tr><td align='right' colspan='2'><input type='submit' value='Save'>\n";
+        print "<input type='button' value='Cancel'></td></tr>\n";
+        print "</table>\n</form>\n";
         print "</article>\n";
         return 1;
     }

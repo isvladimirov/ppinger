@@ -37,12 +37,11 @@ package PMySQL
 
     sub DESTROY
     {
-        my($self) = @_;
         return $dbh->disconnect;
     }
 
     # Returns ref to query hash. Use method 'fetchrow_array' to get next item.
-    # Returns list of folders.
+    # Returns list of child folders in the $parent folder.
     sub getFolderList
     {
         my($self, $parent) = @_;
@@ -63,7 +62,7 @@ package PMySQL
     }
 
     # Returns ref to query hash. Use method 'fetchrow_array' to get next item.
-    # Returns list of hosts.
+    # Returns list of hosts for a current folder.
     #
     # Usage: getHostList($parent, $status)
     #
@@ -105,6 +104,27 @@ package PMySQL
         my($self) = @_;
         return $self->{ITEMS_COUNT};
     }
+    
+    # Returns name of a folder with $id.
+    sub getFolderNameById
+    {
+        my($self, $id) = @_;
+        my $queryHash = $dbh->prepare("SELECT name FROM folders WHERE id=$id;");
+        $queryHash->execute;
+        my @row = $queryHash->fetchrow_array();
+        $queryHash->finish();
+        return $row[0];
+    }
 
+    # Returns parent id of a folder with $id.
+    sub getFolderParentById
+    {
+        my($self, $id) = @_;
+        my $queryHash = $dbh->prepare("SELECT parent_id FROM folders WHERE id=$id;");
+        $queryHash->execute;
+        my @row = $queryHash->fetchrow_array();
+        $queryHash->finish();
+        return $row[0];
+    }
 }
 1;

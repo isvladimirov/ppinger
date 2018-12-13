@@ -87,7 +87,7 @@ switch ($action)
     case "edit_folder"
     {
         # Draw edit form for a folder
-        $ui->editFolder($folderId, "Example folder name", 0);
+        $ui->editFolder($folderId, $db->getFolderNameById($folderId), 0);
     }
     else
     {
@@ -112,7 +112,7 @@ switch ($action)
 }
 
 # Draw footer
-$ui->addFooter("PPinger ".(VERSION)." | Разрабатываемая версия | folderId: $folderId");
+$ui->addFooter("PPinger v".(VERSION)." | Разрабатываемая версия");
 
 # Close database
 $db->DESTROY;
