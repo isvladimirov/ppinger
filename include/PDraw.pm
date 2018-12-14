@@ -185,7 +185,8 @@ package PDraw
     # Draws folder edit form
     sub editFolder
     {
-        my($self, $id, $name, $parentId) = @_;
+        my($self, $id, $name, $parentId, $foldersHash) = @_;
+        my @row = ();
         $id or $id="New";
         print "<article id='pageHosts'>\n";
         print "<h1>Edit folder</h1>\n";
@@ -195,7 +196,18 @@ package PDraw
         print "<tr><td>Folder ID:</td><td>$id</td></tr>\n";
         print "<tr><td>Folder parent:</td>\n";
         print "<td><select name='new_parent_name'>\n";
-        print "<option>Example parent</option>\n";
+        print "<option value='-1'>Root</option>\n";
+        while (@row = $foldersHash->fetchrow_array())
+        {
+            if($parentId==$row[0])
+            {
+                print "<option selected value='$row[0]'>$row[1]</option>\n";
+            }
+            else
+            {
+                print "<option value='$row[0]'>$row[1]</option>\n";
+            }
+        }
         print "</select></td><tr>\n";
         print "<tr><td align='right' colspan='2'><input type='submit' value='Save'>\n";
         print "<input type='button' value='Cancel'></td></tr>\n";

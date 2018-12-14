@@ -42,11 +42,12 @@ package PMySQL
 
     # Returns ref to query hash. Use method 'fetchrow_array' to get next item.
     # Returns list of child folders in the $parent folder.
+    # $parent=0 means all folders.
     sub getFolderList
     {
         my($self, $parent) = @_;
         my $query;
-        if ($parent)
+        if($parent)
         {
             # If a parent is set return its children only
             $query = "SELECT id,name FROM folders WHERE parent_id=$parent ORDER BY name;";
@@ -83,7 +84,6 @@ package PMySQL
     # 10 - last_status
     # 11 - status_changed
     # 12 - comment
-
     sub getHostList
     {
         my($self, $parent, $status) = @_;
@@ -121,6 +121,17 @@ package PMySQL
     {
         my($self, $id) = @_;
         my $queryHash = $dbh->prepare("SELECT parent_id FROM folders WHERE id=$id;");
+        $queryHash->execute;
+        my @row = $queryHash->fetchrow_array();
+        $queryHash->finish();
+        return $row[0];
+    }
+    
+    # Returns id of the folder by a given name
+    sub getFolderIdByName
+    {
+        my($self, $name) = @_;
+        my $queryHash = $dbh->prepare("SELECT id FROM folders WHERE name=$name;");
         $queryHash->execute;
         my @row = $queryHash->fetchrow_array();
         $queryHash->finish();

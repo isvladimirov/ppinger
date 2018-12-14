@@ -40,6 +40,7 @@ my $refresh = 0;
 my $action = $queryCGI->param('action');
 my $folderId = $queryCGI->param('folder_id');
 my $editMode = 0;
+my $hash;
 
 switch ($action)
 {
@@ -87,7 +88,12 @@ switch ($action)
     case "edit_folder"
     {
         # Draw edit form for a folder
-        $ui->editFolder($folderId, $db->getFolderNameById($folderId), 0);
+        $hash = $db->getFolderList(0);
+        $ui->editFolder($folderId,
+                        $db->getFolderNameById($folderId),
+                        $db->getFolderParentById($folderId),
+                        $hash);
+        $hash->finish();
     }
     else
     {
@@ -104,7 +110,15 @@ switch ($action)
                 case 3 { $row[3] = "down"; }
                 case 4 { $row[3] = "disabled"; }
             }
-            $ui->addHost($editMode, $row[1], $row[0], $row[3], $ row[4], $row[9], $row[10], $row[12], $row[11]);
+            $ui->addHost($editMode, # Turn on edit mode
+                         $row[1],   # Hostname
+                         $row[0],   # Host ID
+                         $row[3],   # Status
+                         $row[4],   # Reply
+                         $row[9],   # LTT
+                         $row[10],  # Last status
+                         $row[12],  # Comment
+                         $row[11]); # Time of status change
         }
         $sth->finish();
         $ui->closeHosts();
