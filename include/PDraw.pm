@@ -192,7 +192,7 @@ package PDraw
         print "<h1>Edit folder</h1>\n";
         print "<form action='./write.pl?folder_id=$id' method='post'>\n";
         print "<table id='formEditFolder'>\n";
-        print "<tr><td>Folder name:</td><td><input type='text' value='$name'></td></tr>\n";
+        print "<tr><td>Folder name:</td><td><input name='name' type='text' value='$name'></td></tr>\n";
         print "<tr><td>Folder ID:</td><td>$id</td></tr>\n";
         print "<tr><td>Folder parent:</td>\n";
         print "<td><select name='new_parent_name'>\n";
@@ -208,9 +208,14 @@ package PDraw
                 print "<option value='$row[0]'>$row[1]</option>\n";
             }
         }
-        print "</select></td><tr>\n";
+        print "</select></td></tr>\n";
+        if ($id!="New")
+        {
+            print "<tr><td>Delete:</td>\n";
+            print "<td><input type='checkbox' name='delete' value='delete'></td></tr>\n";
+        }
         print "<tr><td align='right' colspan='2'><input type='submit' value='Save'>\n";
-        print "<input type='button' value='Cancel'></td></tr>\n";
+        print "<input type='button' value='Cancel' onclick='window.history.back()' /></td></tr>\n";
         print "</table>\n</form>\n";
         print "</article>\n";
         return 1;
