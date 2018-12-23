@@ -203,7 +203,7 @@ package PDraw
             {
                 print "<option selected value='$row[0]'>$row[1]</option>\n";
             }
-            else
+            elsif($id!=$row[0])
             {
                 print "<option value='$row[0]'>$row[1]</option>\n";
             }
@@ -221,6 +221,12 @@ package PDraw
         print "</form>\n";
         print "</article>\n";
         return 1;
+    }
+    
+    # Draws host edit form
+    sub editHost
+    {
+        my($self) = @_;
     }
 }
 1;
