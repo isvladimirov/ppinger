@@ -26,6 +26,7 @@ package PMySQL
             name => 'PMySQL',
             version => '1.0',
             ITEMS_COUNT => 0,
+            LAST_ERROR => '',
         };
         $dbh = DBI->connect("DBI:mysql:$database:$host", $user, $pass)
             or die "Can't connect to database";
@@ -105,6 +106,13 @@ package PMySQL
         return $self->{ITEMS_COUNT};
     }
     
+    # Returns last error
+    sub getLastError
+    {
+        my($self) = @_;
+        return $self->{LAST_ERROR};
+    }
+    
     # Returns name of a folder with $id.
     sub getFolderNameById
     {
@@ -135,7 +143,32 @@ package PMySQL
         $queryHash->execute;
         my @row = $queryHash->fetchrow_array();
         $queryHash->finish();
+        $row[0] or $row[0]=0;
         return $row[0];
+    }
+    
+    # Creates folder
+    sub createFolder
+    {
+        my($self, $name, $parent) = @_;
+        return $dbh->do("INSERT INTO folders (name, parent_id) VALUES ('$name', $parent);");
+    }
+    
+    # Deletes folder with given ID
+    sub deleteFolder
+    {
+        my($self, $id) = @_;
+        return $dbh->do("DELETE FROM folders WHERE id=$id;");
+    }
+    
+    # Updates folder
+    sub updateFolder
+    {
+        my($self, $id, $name, $parentId) = @_;
+        if (!($id =~ /^\d+?$/)) {$self->{LAST_ERROR}="Given Folder ID is not digital!"; return 0;}
+        if (!($parentId =~ /^\d+?$/)) {$self->{LAST_ERROR}="Given Parent ID is not digital!"; return 0;}
+        if ($id eq $parentId) {$self->{LAST_ERROR}="Cannot move folder to itself!"; return 0;}
+        return $dbh->do("UPDATE folders SET name='$name', parent_id=$parentId WHERE id=$id;");
     }
 }
 1;
