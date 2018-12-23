@@ -2,10 +2,12 @@
 
 #######################################
 # PPinger
+# index.pl
 # Point of entrance
 # Copyright 2018 duk3L3t0
 #######################################
 
+#use CGI::Carp qw(warningsToBrowser fatalsToBrowser);
 use lib 'include';
 use PDraw;
 use PMySQL;
