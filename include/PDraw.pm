@@ -33,7 +33,7 @@ package PDraw
     sub addHeader
     {
         my($self, $title, $refresh) = @_;
-        print "Content-type: text/html\n\n";
+        #print "Content-type: text/html\n\n";
         print "<!DOCTYPE html>\n";
         print "<html>\n";
         print "<head>\n";

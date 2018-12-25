@@ -7,16 +7,17 @@
 # Copyright 2018 duk3L3t0
 #######################################
 
-#use CGI::Carp qw(warningsToBrowser fatalsToBrowser);
+use CGI::Carp qw(warningsToBrowser fatalsToBrowser);
 use lib 'include';
 use PDraw;
 use PMySQL;
-use CGI qw(:standard);
+use utf8;
+use CGI qw(-utf8);
 use Config::IniFiles;
 use Switch;
 use strict;
 
-use constant VERSION => 0.3;
+use constant VERSION => 0.4;
 
 # Recursive function for drawing folder tree
 sub drawFolderField;
@@ -29,7 +30,7 @@ my $db = PMySQL->new(
     $config->val('SQL', 'db_user'),
     $config->val('SQL', 'db_pass'),
     $config->val('SQL', 'db_name')
-);
+) or die("Error! Can't connect to database!");
 
 # Array for fetching MySQL data
 my @row = ();
@@ -41,36 +42,57 @@ my $title = $config->val('Global', 'title');
 my $refresh = 0;
 my $action = $queryCGI->param('action');
 my $folderId = $queryCGI->param('folder_id');
-my $editMode = 0;
+my $editMode = $queryCGI->cookie('EDIT_MODE');
 my $hash;
+my $cookie;
+my $message="Nothing interesting";
 
 switch ($action)
 {
     case "edit"
     {
-        # Draw main form with edit functions
-        $action = "edit";
-        $editMode = 1;
-        $title = $title . " :: Configuration mode";
+        # Toggle edit mode
+        if ($editMode)
+        {
+            # Edit mode is on. Turn it off.
+            $cookie = new CGI::Cookie(-name=>'EDIT_MODE',-value=>'0');
+            $editMode = 0;
+            $action = "view";
+            $refresh = $config->val('Global', 'refresh');
+            $title .= " :: View mode";
+            $message = "Edit mode is turned off.";
+        }
+        else
+        {
+            # Edit mode is off. Turn it on.
+            $cookie = new CGI::Cookie(-name=>'EDIT_MODE',-value=>'1');
+            $editMode = 1;
+            $title = $title . " :: Configuration mode";
+            $message = "Edit mode is turned on.";
+        }
     }
     case "edit_folder"
     {
-        $action = "edit_folder";
         $editMode = 1;
         $title = $title . " :: Edit folder";
     }
     case "edit_host"
     {
-        $action = "edit_host";
         $editMode = 1;
         $title = $title . " :: Edit host";
     }
     else
     {
         # Draw main form
-        $action = "view";
-        $refresh = $config->val('Global', 'refresh');
-        $title .= " :: View mode";
+        if ($editMode)
+        {
+            $title = $title . " :: Configuration mode";
+        }
+        else
+        {
+            $refresh = $config->val('Global', 'refresh');
+            $title .= " :: View mode";
+        }
     }
 }
 
@@ -78,6 +100,14 @@ switch ($action)
 $folderId =~ /^\d+?$/ or $folderId = 0;
 
 # Draw header
+if ($cookie)
+{
+    print $queryCGI->header(-type=>"text/html;charset=UTF-8",-cookie=>$cookie);
+}
+else
+{
+    print $queryCGI->header(-type=>"text/html;charset=UTF-8");
+}
 $ui->addHeader($title, $refresh);
 
 # Draw folders
@@ -128,7 +158,7 @@ switch ($action)
 }
 
 # Draw footer
-$ui->addFooter("PPinger v".(VERSION)." | Разрабатываемая версия");
+$ui->addFooter("PPinger v".(VERSION)." | Разрабатываемая версия | $message");
 
 # Close database
 $db->DESTROY;
