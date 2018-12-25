@@ -17,7 +17,15 @@ use Config::IniFiles;
 use Switch;
 use strict;
 
-use constant VERSION => 0.4;
+use constant
+{
+    APP_VERSION => 0.4,
+    STATUS_ALL => 0,
+    STATUS_DOWN => 1,
+    STATUS_ALIVE => 2,
+    STATUS_UNKNOWN => 3,
+    STATUS_DISABLED => 4,
+};
 
 # Recursive function for drawing folder tree
 sub drawFolderField;
@@ -38,7 +46,7 @@ my @row = ();
 # Open output
 my $ui = PDraw->new();
 
-my $title = $config->val('Global', 'title');
+my $title = $config->val('Web', 'title');
 my $refresh = 0;
 my $action = $queryCGI->param('action');
 my $folderId = $queryCGI->param('folder_id');
@@ -58,9 +66,9 @@ switch ($action)
             $cookie = new CGI::Cookie(-name=>'EDIT_MODE',-value=>'0');
             $editMode = 0;
             $action = "view";
-            $refresh = $config->val('Global', 'refresh');
+            $refresh = $config->val('Web', 'refresh');
             $title .= " :: View mode";
-            $message = "Edit mode is turned off.";
+            $message = "Edit mode is turned off";
         }
         else
         {
@@ -68,7 +76,7 @@ switch ($action)
             $cookie = new CGI::Cookie(-name=>'EDIT_MODE',-value=>'1');
             $editMode = 1;
             $title = $title . " :: Configuration mode";
-            $message = "Edit mode is turned on.";
+            $message = "Edit mode is turned on";
         }
     }
     case "edit_folder"
@@ -90,7 +98,7 @@ switch ($action)
         }
         else
         {
-            $refresh = $config->val('Global', 'refresh');
+            $refresh = $config->val('Web', 'refresh');
             $title .= " :: View mode";
         }
     }
@@ -131,16 +139,16 @@ switch ($action)
     {
         # Draw hosts
         $ui->openHosts($editMode);
-        my $sth = $db->getHostList(0);
+        my $sth = $db->getHostList($folderId);
         for (my $i=1; $i <= $db->getItemsCount; $i++)
         {
             @row = $sth->fetchrow_array;
             switch ($row[3])
             {
-                case 1 { $row[3] = "unknown"; }
-                case 2 { $row[3] = "alive"; }
-                case 3 { $row[3] = "down"; }
-                case 4 { $row[3] = "disabled"; }
+                case (STATUS_DOWN)     { $row[3] = "down"; }
+                case (STATUS_ALIVE)    { $row[3] = "alive"; }
+                case (STATUS_UNKNOWN)  { $row[3] = "unknown"; }
+                case (STATUS_DISABLED) { $row[3] = "disabled"; }
             }
             $ui->addHost($editMode, # Turn on edit mode
                          $row[1],   # Hostname
@@ -158,7 +166,7 @@ switch ($action)
 }
 
 # Draw footer
-$ui->addFooter("PPinger v".(VERSION)." | Разрабатываемая версия | $message");
+$ui->addFooter("PPinger v".(APP_VERSION)." | Разрабатываемая версия | $message");
 
 # Close database
 $db->DESTROY;

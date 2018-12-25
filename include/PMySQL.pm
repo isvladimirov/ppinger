@@ -7,9 +7,9 @@
 #######################################
 # Status values:
 # 0 - show all (when it's posible)
-# 1 - Unknown
+# 1 - Down
 # 2 - Alive
-# 3 - Down
+# 3 - Unknown
 # 4 - Disabled
 
 package PMySQL
@@ -93,7 +93,7 @@ package PMySQL
         if ( ($where) && ($status) ) { $where = $where . " and"; }
         if ($status) { $where = $where . " status=$status"; }
         if ($where) { $where = "WHERE" . $where; }
-        my $query = "SELECT id,host,parent_id,status,reply,method,port,attempts,timeout,last_test_time,last_status,status_changed,comment FROM hosts $where ORDER BY host;";
+        my $query = "SELECT id,host,parent_id,status,reply,method,port,attempts,timeout,last_test_time,last_status,status_changed,comment FROM hosts $where ORDER BY status, host;";
         my $queryHash = $dbh->prepare($query);
         $self->{ITEMS_COUNT} = $queryHash->execute;
         return $queryHash;
@@ -158,6 +158,7 @@ package PMySQL
     sub deleteFolder
     {
         my($self, $id) = @_;
+        # This method must be rewrited. It should delete all subfolders and children as well.
         return $dbh->do("DELETE FROM folders WHERE id=$id;");
     }
     

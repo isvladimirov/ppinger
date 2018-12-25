@@ -7,9 +7,9 @@
 #######################################
 # Status values:
 # 0 - Show all (when it's posible)
-# 1 - Unknown
+# 1 - Down
 # 2 - Alive
-# 3 - Down
+# 3 - Unknown
 # 4 - Disabled
 
 package PDraw
@@ -57,7 +57,7 @@ package PDraw
         return 1;
     }
 
-    #Draws footer and closes html page
+    # Draws footer and closes html page
     sub addFooter
     {
         my($self, $status) = @_;
@@ -162,7 +162,7 @@ package PDraw
         print "<tr id='$tableRowId'>";
         if ($need_edit)
         {
-            print "<td id='$tableRowId'><img width='16' src='share/edit-text-frame-update.svg'></td>"
+            print "<td><img width='16' src='share/edit-text-frame-update.svg'></td>"
         }
         print "<td id='mainTableDataHost'>$name</td>";
         print "<td>$status</td>";
@@ -171,7 +171,7 @@ package PDraw
         print "<td>unknown</td>";
         print "<td id='mainTableComment'>$comment</td>";
         print "<td>$statusChanged</td>";
-        print "<tr>\n";
+        print "</tr>\n";
         return 1;
     }
 
@@ -211,7 +211,7 @@ package PDraw
         print "</select></td></tr>\n";
         if ($id!="New")
         {
-            print "<tr><td>Delete:</td>\n";
+            print "<tr><td>Delete (with children):</td>\n";
             print "<td><input type='checkbox' name='delete' value='folder'></td></tr>\n";
         }
         print "<tr><td align='right' colspan='2'><input type='submit' value='Save'>\n";
