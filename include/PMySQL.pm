@@ -159,6 +159,7 @@ package PMySQL
     {
         my($self, $id) = @_;
         # This method must be rewrited. It should delete all subfolders and children as well.
+        if ($id<1) {$self->{LAST_ERROR}="Cannot remove system folder!"; return 0;}
         return $dbh->do("DELETE FROM folders WHERE id=$id;");
     }
     

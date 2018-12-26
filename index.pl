@@ -29,6 +29,8 @@ use constant
 
 # Recursive function for drawing folder tree
 sub drawFolderField;
+# Recursive function for drawing hosts
+sub drawHostField;
 
 my $config = Config::IniFiles->new( -file => "etc/ppinger.cfg" );
 my $queryCGI = CGI->new();
@@ -39,9 +41,6 @@ my $db = PMySQL->new(
     $config->val('SQL', 'db_pass'),
     $config->val('SQL', 'db_name')
 ) or die("Error! Can't connect to database!");
-
-# Array for fetching MySQL data
-my @row = ();
 
 # Open output
 my $ui = PDraw->new();
@@ -139,28 +138,7 @@ switch ($action)
     {
         # Draw hosts
         $ui->openHosts($editMode);
-        my $sth = $db->getHostList($folderId);
-        for (my $i=1; $i <= $db->getItemsCount; $i++)
-        {
-            @row = $sth->fetchrow_array;
-            switch ($row[3])
-            {
-                case (STATUS_DOWN)     { $row[3] = "down"; }
-                case (STATUS_ALIVE)    { $row[3] = "alive"; }
-                case (STATUS_UNKNOWN)  { $row[3] = "unknown"; }
-                case (STATUS_DISABLED) { $row[3] = "disabled"; }
-            }
-            $ui->addHost($editMode, # Turn on edit mode
-                         $row[1],   # Hostname
-                         $row[0],   # Host ID
-                         $row[3],   # Status
-                         $row[4],   # Reply
-                         $row[9],   # LTT
-                         $row[10],  # Last status
-                         $row[12],  # Comment
-                         $row[11]); # Time of status change
-        }
-        $sth->finish();
+        drawHostField($folderId, $config->val('Web', 'sub_folders'));
         $ui->closeHosts();
     }
 }
@@ -185,5 +163,50 @@ sub drawFolderField
         drawFolderField($sourceDB, $destinationUI, $row[0], $level+1, $folderId);
     }
     $sth->finish();
+    return 1;
+}
+
+sub drawHostField
+{
+    my ($parent, $isRecursive) = @_;
+    my @row = ();
+    if (($parent==0)&&($isRecursive))
+    {
+        $parent=-1;
+    }
+    my $sth = $db->getHostList($parent);
+    
+    # Draw host is the current folder
+    while (@row = $sth->fetchrow_array)
+    {
+        switch ($row[3])
+        {
+            case (STATUS_DOWN)     { $row[3] = "down"; }
+            case (STATUS_ALIVE)    { $row[3] = "alive"; }
+            case (STATUS_UNKNOWN)  { $row[3] = "unknown"; }
+            case (STATUS_DISABLED) { $row[3] = "disabled"; }
+        }
+        $ui->addHost($editMode, # Turn on edit mode
+        $row[1],   # Hostname
+        $row[0],   # Host ID
+        $row[3],   # Status
+        $row[4],   # Reply
+        $row[9],   # LTT
+        $row[10],  # Last status
+        $row[12],  # Comment
+        $row[11]); # Time of status change
+    }
+    $sth->finish();
+    
+    # If a recursive mode is on walk deep in subfolders...
+    if ($isRecursive)
+    {
+        $sth = $db->getFolderList($parent);
+        while (@row = $sth->fetchrow_array)
+        {
+            drawHostField($row[0], $isRecursive);
+        }
+        $sth->finish();
+    }
     return 1;
 }
