@@ -23,8 +23,8 @@ package PMySQL
     {
         my($class, $host, $user, $pass, $database) = @_;
         my $self = {
-            name => 'PMySQL',
-            version => '1.0',
+            NAME => 'PMySQL',
+            VERSION => '1.0',
             ITEMS_COUNT => 0,
             LAST_ERROR => '',
         };
@@ -160,7 +160,19 @@ package PMySQL
         my($self, $id) = @_;
         # This method must be rewrited. It should delete all subfolders and children as well.
         if ($id<1) {$self->{LAST_ERROR}="Cannot remove system folder!"; return 0;}
-        return $dbh->do("DELETE FROM folders WHERE id=$id;");
+        # Delete hosts in a given folder
+        $dbh->do("DELETE FROM hosts WHERE parent_id=$id;");
+        # Delete folder
+        $dbh->do("DELETE FROM folders WHERE id=$id;");
+        # Check for subfolders
+        my $sth = $self->getFolderList($id);
+        my @row = ();
+        while (@row = $sth->fetchrow_array)
+        {
+            $self->deleteFolder($row[0]);
+        }
+        $sth->finish();
+        return 1;
     }
     
     # Updates folder

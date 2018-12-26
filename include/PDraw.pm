@@ -18,13 +18,15 @@ package PDraw
     use POSIX qw(strftime);
     use Switch;
     use strict;
+    use utf8;
+    use CGI qw(-utf8);
 
     sub new
     {
         my($class) = @_;
         my $self = {
-            name => 'PDraw',
-            version => '1.0',
+            NAME => 'PDraw',
+            VERSION => '1.0',
         };
         bless $self, $class;
         return $self;
@@ -32,8 +34,16 @@ package PDraw
 
     sub addHeader
     {
-        my($self, $title, $refresh) = @_;
-        #print "Content-type: text/html\n\n";
+        my($self, $title, $refresh, $cookie) = @_;
+        my $queryCGI = CGI->new();
+        if ($cookie)
+        {
+            print $queryCGI->header(-type=>"text/html;charset=UTF-8",-cookie=>$cookie);
+        }
+        else
+        {
+            print $queryCGI->header(-type=>"text/html;charset=UTF-8");
+        }
         print "<!DOCTYPE html>\n";
         print "<html>\n";
         print "<head>\n";
