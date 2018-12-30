@@ -59,6 +59,7 @@ sub drawHostField
         $sth = $sourceDB->getFolderList($parent);
         while (@row = $sth->fetchrow_array)
         {
+            $destinationUI->addHostSeparator($row[1]);
             drawHostField($sourceDB, $destinationUI, $row[0], $isRecursive, $editMode);
         }
         $sth->finish();

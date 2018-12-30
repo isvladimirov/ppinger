@@ -184,6 +184,15 @@ package PDraw
         print "</tr>\n";
         return 1;
     }
+    
+    sub addHostSeparator
+    {
+        my($self, $title) = @_;
+        print "<tr id='mainTableSeparator'>";
+        print "<td colspan='7'>$title</td>";
+        print "</tr>\n";
+        return 1;
+    }
 
     sub closeHosts
     {
