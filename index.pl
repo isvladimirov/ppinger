@@ -9,7 +9,7 @@
 
 use CGI::Carp qw(warningsToBrowser fatalsToBrowser);
 use lib "include";
-require "lib.pl";
+require "PCore.pl";
 use PDraw;
 use PMySQL;
 use utf8;
