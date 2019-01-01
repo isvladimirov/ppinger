@@ -144,18 +144,19 @@ package PDraw
         my($self, $need_edit) = @_;
         print "<article id='pageHosts'>\n";
         print "<table id='mainTable'>\n";
-        print "<tr id='mainTableHeader'>";
+        print "<tr id='mainTableHeader'>\n";
         if ($need_edit)
         {
-            print "<th id='mainTableHeaderAdd'><img width='16' src='share/fork.svg'></th>"
+            print "<th id='mainTableHeaderAdd'><a href='./index.pl?action=edit_host'>";
+            print "<img width='16' src='share/fork.svg' alt='Edit this host'></a></th>\n";
         }
-        print "<th id='mainTableHeaderHost'>Host</th>";
-        print "<th id='mainTableHeaderStatus'>Status</th>";
-        print "<th id='mainTableHeaderReply'>Reply</th>";
-        print "<th id='mainTableHeaderLTT'>Last Test Time</th>";
-        print "<th id='mainTableHeaderLS'>Last Status</th>";
-        print "<th id='mainTableHeaderCom'>Comment</th>";
-        print "<th id='mainTableHeaderSC'>Status Changed</th>";
+        print "<th id='mainTableHeaderHost'>Host</th>\n";
+        print "<th id='mainTableHeaderStatus'>Status</th>\n";
+        print "<th id='mainTableHeaderReply'>Reply</th>\n";
+        print "<th id='mainTableHeaderLTT'>Last Test Time</th>\n";
+        print "<th id='mainTableHeaderLS'>Last Status</th>\n";
+        print "<th id='mainTableHeaderCom'>Comment</th>\n";
+        print "<th id='mainTableHeaderSC'>Status Changed</th>\n";
         print "</tr>\n";
         return 1;
     }
@@ -169,18 +170,20 @@ package PDraw
             case "down" { $tableRowId = "mainTableRowBad"; }
             case "disabled" { $tableRowId = "mainTableRowDisabled"; }
         }
-        print "<tr id='$tableRowId'>";
+        print "<tr id='$tableRowId'>\n";
         if ($need_edit)
         {
-            print "<td><img width='16' src='share/edit-text-frame-update.svg'></td>"
+            print "<td><a href='./index.pl?action=edit_host&host_id=$id'>";
+            print "<img width='16' src='share/edit-text-frame-update.svg' alt='Edit this host'>";
+            print "</a></td>\n";
         }
-        print "<td id='mainTableDataHost'>$name</td>";
-        print "<td>$status</td>";
-        print "<td>$reply ms</td>";
-        print "<td>$ltt</td>";
-        print "<td>unknown</td>";
-        print "<td id='mainTableComment'>$comment</td>";
-        print "<td>$statusChanged</td>";
+        print "<td id='mainTableDataHost'>$name</td>\n";
+        print "<td>$status</td>\n";
+        print "<td>$reply ms</td>\n";
+        print "<td>$ltt</td>\n";
+        print "<td>unknown</td>\n";
+        print "<td id='mainTableComment'>$comment</td>\n";
+        print "<td>$statusChanged</td>\n";
         print "</tr>\n";
         return 1;
     }
@@ -210,7 +213,7 @@ package PDraw
         print "<article id='pageHosts'>\n";
         print "<h1>Edit folder</h1>\n";
         print "<form action='./write.pl' method='post'>\n";
-        print "<table id='formEditFolder'>\n";
+        print "<table id='formEdit'>\n";
         print "<tr><td>Folder name:</td><td><input name='name' type='text' value='$name'></td></tr>\n";
         print "<tr><td>Folder ID:</td><td>$id</td></tr>\n";
         print "<tr><td>Folder parent:</td>\n";
@@ -245,7 +248,46 @@ package PDraw
     # Draws host edit form
     sub editHost
     {
-        my($self) = @_;
+        my($self, $id, $name, $parentId, $foldersHash, $comment) = @_;
+        my @row = ();
+        $id or $id="New";
+        $comment or $comment="";
+        print "<article id='pageHosts'>\n";
+        print "<h1>Edit host</h1>\n";
+        print "<form action='./write.pl' method='post'>\n";
+        print "<table id='formEdit'>\n";
+        print "<tr><td>Host name:</td><td><input name='name' type='text' value='$name'></td></tr>\n";
+        print "<tr><td>Host ID:</td><td>$id</td></tr>\n";
+        print "<tr><td>Parent:</td>\n";
+        print "<td><select name='parent_id'>\n";
+        print "<option value='-1'>Root</option>\n";
+        while (@row = $foldersHash->fetchrow_array())
+        {
+            if($parentId==$row[0])
+            {
+                print "<option selected value='$row[0]'>$row[1]</option>\n";
+            }
+            else
+            {
+                print "<option value='$row[0]'>$row[1]</option>\n";
+            }
+        }
+        print "</select></td></tr>\n";
+        print "<tr><td>Comment:</td><td><input name='comment' type='text' value='$comment'></td></tr>\n";
+        print "<tr><td>Disable this host:</td>\n";
+        print "<td><input type='checkbox' name='host_disable' value='1'></td></tr>\n";
+        if ($id!="New")
+        {
+            print "<tr><td>Delete this host:</td>\n";
+            print "<td><input type='checkbox' name='delete' value='host'></td></tr>\n";
+        }
+        print "<tr><td align='right' colspan='2'><input type='submit' value='Save'>\n";
+        print "<input type='button' value='Cancel' onclick='window.history.back()' /></td></tr>\n";
+        print "</table>\n";
+        print "<input type='hidden' name='host_id' value='$id'>\n";
+        print "</form>\n";
+        print "</article>\n";
+        return 1;
     }
 }
 1;

@@ -7,7 +7,7 @@
 # Copyright 2018 duk3L3t0
 #######################################
 
-#use CGI::Carp qw(warningsToBrowser fatalsToBrowser);
+use CGI::Carp qw(warningsToBrowser fatalsToBrowser);
 use lib 'include';
 use PDraw;
 use PMySQL;
@@ -27,8 +27,9 @@ my $db = PMySQL->new(
 );
 
 my $folderId = $queryCGI->param('folder_id');
-my $folderName = $queryCGI->param('name');
-my $parentId = $queryCGI->param('parent_id');
+my $hostId = $queryCGI->param('host_id');
+#my $folderName = $queryCGI->param('name');
+#my $parentId = $queryCGI->param('parent_id');
 my $deleteObject = $queryCGI->param('delete');
 my $output="Content-type: text/html\n\n";
 $output.="<html>\n<head>\n";
@@ -39,7 +40,7 @@ $output.="<body>\n";
 if ($folderId eq 'New')
 {
     $output.="Create new folder ";
-    $db->createFolder($folderName, $parentId);
+    $db->createFolder($queryCGI->param('name'), $queryCGI->param('parent_id'));
 }
 elsif ($deleteObject eq 'folder')
 {
@@ -49,7 +50,17 @@ elsif ($deleteObject eq 'folder')
 elsif ($folderId =~ /^\d+?$/)
 {
     $output.="Update folder ";
-    $db->updateFolder($folderId, $folderName, $parentId);
+    $db->updateFolder($folderId, $queryCGI->param('name'), $queryCGI->param('parent_id'));
+}
+elsif ($deleteObject eq 'host')
+{
+    $output.="Delete host ";
+    #$db->deleteHost($hostId);
+}
+elsif ($hostId =~ /^\d+?$/)
+{
+    $output.="Update host ";
+    #$db->updateHost($hostId, $folderName, $parentId);
 }
 else
 {

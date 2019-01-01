@@ -184,5 +184,51 @@ package PMySQL
         if ($id eq $parentId) {$self->{LAST_ERROR}="Cannot move folder to itself!"; return 0;}
         return $dbh->do("UPDATE folders SET name='$name', parent_id=$parentId WHERE id=$id;");
     }
+    
+    # Returns name of a host with $id.
+    sub getHostNameById
+    {
+        my($self, $id) = @_;
+        my $queryHash = $dbh->prepare("SELECT host FROM hosts WHERE id=$id;");
+        $queryHash->execute;
+        my @row = $queryHash->fetchrow_array();
+        $queryHash->finish();
+        return $row[0];
+    }
+
+    # Returns parent id of a host with $id.
+    sub getHostParentById
+    {
+        my($self, $id) = @_;
+        my $queryHash = $dbh->prepare("SELECT parent_id FROM hosts WHERE id=$id;");
+        $queryHash->execute;
+        my @row = $queryHash->fetchrow_array();
+        $queryHash->finish();
+        return $row[0];
+    }
+    
+    # Returns id of the host by a given name
+    sub getHostIdByName
+    {
+        my($self, $name) = @_;
+        my $queryHash = $dbh->prepare("SELECT id FROM hosts WHERE name=$name;");
+        $queryHash->execute;
+        my @row = $queryHash->fetchrow_array();
+        $queryHash->finish();
+        $row[0] or $row[0]=0;
+        return $row[0];
+    }
+    
+    # Returns id of the host by a given name
+    sub getHostCommentById
+    {
+        my($self, $id) = @_;
+        my $queryHash = $dbh->prepare("SELECT comment FROM hosts WHERE id=$id;");
+        $queryHash->execute;
+        my @row = $queryHash->fetchrow_array();
+        $queryHash->finish();
+        $row[0] or $row[0]=0;
+        return $row[0];
+    }
 }
 1;

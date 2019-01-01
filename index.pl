@@ -44,6 +44,7 @@ my $title = $config->val('Web', 'title');
 my $refresh = 0;
 my $action = $queryCGI->param('action');
 my $folderId = $queryCGI->param('folder_id');
+my $hostId = $queryCGI->param('host_id');
 my $editMode = $queryCGI->cookie('EDIT_MODE');
 my $hash;
 my $cookie;
@@ -98,8 +99,9 @@ switch ($action)
     }
 }
 
-# Validate $folderId
+# Validate params
 $folderId =~ /^\d+?$/ or $folderId = 0;
+$hostId =~ /^\d+?$/ or $hostId = 0;
 
 # Draw header
 $ui->addHeader($title, $refresh, $cookie);
@@ -119,6 +121,17 @@ switch ($action)
                         $db->getFolderNameById($folderId),
                         $db->getFolderParentById($folderId),
                         $hash);
+        $hash->finish();
+    }
+    case "edit_host"
+    {
+        # Draw edit form for a folder
+        $hash = $db->getFolderList(0);
+        $ui->editHost($hostId,
+                        $db->getHostNameById($hostId),
+                        $db->getHostParentById($hostId),
+                        $hash,
+                        $db->getHostCommentById($hostId));
         $hash->finish();
     }
     else
