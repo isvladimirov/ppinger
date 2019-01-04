@@ -273,6 +273,13 @@ package PDraw
             }
         }
         print "</select></td></tr>\n";
+        print "<tr><td>Method:</td><td><select name='method'>\n";
+        print "<option value='ping'>Ping</option>\n";
+        print "<option value='tcp'>TCP</option>";
+        print "<option value='udp'>UDP</option>";
+        print "</select></td></tr>\n";
+        print "<tr><td>Attempts:</td><td><input name='attempts' type='text' value='4'></td></tr>\n";
+        print "<tr><td>Timeout:</td><td><input name='timeout' type='text' value='600'></td></tr>\n";
         print "<tr><td>Comment:</td><td><input name='comment' type='text' value='$comment'></td></tr>\n";
         print "<tr><td>Disable this host:</td>\n";
         print "<td><input type='checkbox' name='host_disable' value='1'></td></tr>\n";

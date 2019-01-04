@@ -19,7 +19,7 @@ use Switch;
 use strict;
 use constant
 {
-    APP_VERSION => 0.4,
+    APP_VERSION => 0.5,
     STATUS_ALL => 0,
     STATUS_DOWN => 1,
     STATUS_ALIVE => 2,
