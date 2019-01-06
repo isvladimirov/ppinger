@@ -192,7 +192,7 @@ package PDraw
     {
         my($self, $title) = @_;
         print "<tr id='mainTableSeparator'>";
-        print "<td colspan='7'>$title</td>";
+        print "<td colspan='8'>$title</td>";
         print "</tr>\n";
         return 1;
     }
@@ -250,12 +250,14 @@ package PDraw
     {
         my($self, $foldersHash, %host) = @_;
         $host{"id"} or $host{"id"} = "New";
+        $host{"attempts"} or $host{"attempts"} = 2;
+        $host{"timeout"} or $host{"timeout"} = 200;
         $host{"comment"} or $host{"comment"} = "";
         print "<article id='pageHosts'>\n";
         print "<h1>Edit host</h1>\n";
         print "<form action='./write.pl' method='post'>\n";
         print "<table id='formEdit'>\n";
-        print "<tr><td>Host name:</td><td><input name='name' type='text' value='".$host{"host"}."'></td></tr>\n";
+        print "<tr><td>Host name:</td><td><input name='host' type='text' value='".$host{"host"}."'></td></tr>\n";
         print "<tr><td>Host ID:</td><td>".$host{"id"}."</td></tr>\n";
         print "<tr><td>Parent:</td>\n";
         print "<td><select name='parent_id'>\n";
@@ -274,17 +276,44 @@ package PDraw
         }
         print "</select></td></tr>\n";
         print "<tr><td>Method:</td><td><select name='method'>\n";
-        # TODO: Make the same as parent_id
-        print "<option value='ping'>Ping</option>\n";
-        print "<option value='tcp'>TCP</option>\n";
-        print "<option value='udp'>UDP</option>\n";
+        if ($host{"method"} eq "ping")
+        {
+            print "<option selected value='ping'>Ping</option>\n";
+        }
+        else
+        {
+            print "<option value='ping'>Ping</option>\n";
+        }
+        if ($host{"method"} eq "tcp")
+        {
+            print "<option selected value='tcp'>TCP</option>\n";
+        }
+        else
+        {
+            print "<option value='tcp'>TCP</option>\n";
+        }
+        if ($host{"method"} eq "udp")
+        {
+            print "<option selected value='udp'>UDP</option>\n";
+        }
+        else
+        {
+            print "<option value='udp'>UDP</option>\n";
+        }
         print "</select></td></tr>\n";
+        print "<tr><td>Port:</td><td><input name='port' type='text' value='".$host{"port"}."'></td></tr>\n";
         print "<tr><td>Attempts:</td><td><input name='attempts' type='text' value='".$host{"attempts"}."'></td></tr>\n";
         print "<tr><td>Timeout:</td><td><input name='timeout' type='text' value='".$host{"timeout"}."'></td></tr>\n";
         print "<tr><td>Comment:</td><td><input name='comment' type='text' value='".$host{"comment"}."'></td></tr>\n";
-        print "<tr><td>Disable this host:</td>\n";
-        # TODO: If a status is disable then check the box
-        print "<td><input type='checkbox' name='host_disable' value='1'></td></tr>\n";
+        print "<tr><td>Disabled:</td>\n";
+        if($host{"status"}==4)
+        {
+            print "<td><input type='checkbox' checked name='host_disable' value='1'></td></tr>\n";
+        }
+        else
+        {
+            print "<td><input type='checkbox' name='host_disable' value='1'></td></tr>\n";
+        }
         if ($host{"id"}!="New")
         {
             print "<tr><td>Delete this host:</td>\n";

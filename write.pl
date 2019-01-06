@@ -27,13 +27,11 @@ my $db = PMySQL->new(
 );
 
 my $folderId = $queryCGI->param('folder_id');
-my $hostId = $queryCGI->param('host_id');
-#my $folderName = $queryCGI->param('name');
-#my $parentId = $queryCGI->param('parent_id');
+my %host = ( 'id' => $queryCGI->param('host_id') );
 my $deleteObject = $queryCGI->param('delete');
 my $output="Content-type: text/html\n\n";
 $output.="<html>\n<head>\n";
-$output.="<meta http-equiv='refresh' content='3;url=./index.pl'>\n";
+$output.="<meta http-equiv='refresh' content='2;url=./index.pl'>\n";
 $output.="</head>\n";
 $output.="<body>\n";
 
@@ -49,18 +47,41 @@ elsif ($deleteObject eq 'folder')
 }
 elsif ($folderId =~ /^\d+?$/)
 {
-    $output.="Update folder ";
+    $output.="Folder update ";
     $db->updateFolder($folderId, $queryCGI->param('name'), $queryCGI->param('parent_id'));
+}
+elsif ($host{"id"} eq 'New')
+{
+    $output.="Create new host ";
+    $host{"host"} = $queryCGI->param('host');
+    $host{"parentId"} = $queryCGI->param('parent_id');
+    $host{"method"} = $queryCGI->param('method');
+    $host{"port"} = $queryCGI->param('port');
+    $host{"attempts"} = $queryCGI->param('attempts');
+    $host{"timeout"} = $queryCGI->param('timeout');
+    $host{"comment"} = $queryCGI->param('comment');
+    if ($queryCGI->param('host_disable')) {$host{"status"} = 4;}
+    else {$host{"status"} = 3;}
+    $db->createHost(%host);
 }
 elsif ($deleteObject eq 'host')
 {
     $output.="Delete host ";
-    #$db->deleteHost($hostId);
+    $db->deleteHost($host{"id"});
 }
-elsif ($hostId =~ /^\d+?$/)
+elsif ($host{"id"} =~ /^\d+?$/)
 {
-    $output.="Update host ";
-    #$db->updateHost($hostId, $folderName, $parentId);
+    $output.="Host update ";
+    $host{"host"} = $queryCGI->param('host');
+    $host{"parentId"} = $queryCGI->param('parent_id');
+    $host{"method"} = $queryCGI->param('method');
+    $host{"port"} = $queryCGI->param('port');
+    $host{"attempts"} = $queryCGI->param('attempts');
+    $host{"timeout"} = $queryCGI->param('timeout');
+    $host{"comment"} = $queryCGI->param('comment');
+    if ($queryCGI->param('host_disable')) {$host{"status"} = 4;}
+    else {$host{"status"} = 3;}
+    $db->updateHost(%host);
 }
 else
 {

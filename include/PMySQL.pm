@@ -255,5 +255,54 @@ package PMySQL
         $row[0] or $row[0]=0;
         return $row[0];
     }
+    
+    # Creates a host
+    sub createHost
+    {
+        my($self, %host) = @_;
+        if ( !($host{"host"}) ) {$self->{LAST_ERROR} = "Hostname cannot be empty!"; return 0;}
+        if ( !($host{"parentId"} =~ /^\d+?$/) ) {$host{"parentId"}=-1;}
+        if ( ($host{"status"} < 1) || ($host{"status"} > 4) ) {$host{"status"} = 3;}
+        $host{"method"} or $host{"method"} = "ping";
+        if ( ($host{"port"} < 1) || ($host{"port"} > 65535) ) {$host{"port"}=1;}
+        if ( !($host{"attempts"} =~ /^\d+?$/) ) {$host{"attempts"}=2;}
+        if ( !($host{"timeout"} =~ /^\d+?$/) ) {$host{"timeout"}=200;}
+        my $query = "INSERT INTO hosts (host, parent_id, status, method, port, attempts, timeout, comment) ";
+        $query .= "VALUES ('".$host{"host"}."', ".$host{"parentId"}.", ".$host{"status"}.", '".$host{"method"}."', ";
+        $query .= $host{"port"}.", ".$host{"attempts"}.", ".$host{"timeout"}.", '".$host{"comment"}."');";
+        return $dbh->do($query);
+    }
+    
+    # Deletes a host
+    sub deleteHost
+    {
+        my($self, $id) = @_;
+        return $dbh->do("DELETE FROM hosts WHERE id=$id;");
+    }
+
+    # Updates a host
+    sub updateHost
+    {
+        my($self, %host) = @_;
+        if ( !($host{"id"} =~ /^\d+?$/) ) {$self->{LAST_ERROR} = "Host ID must be digital!"; return 0;}
+        if ( !($host{"host"}) ) {$self->{LAST_ERROR} = "Hostname cannot be empty!"; return 0;}
+        if ( !($host{"parentId"} =~ /^\d+?$/) ) {$host{"parentId"}=-1;}
+        if ( ($host{"status"} < 1) || ($host{"status"} > 4) ) {$host{"status"} = 3;}
+        $host{"method"} or $host{"method"} = "ping";
+        if ( ($host{"port"} < 1) || ($host{"port"} > 65535) ) {$host{"port"}=1;}
+        if ( !($host{"attempts"} =~ /^\d+?$/) ) {$host{"attempts"}=2;}
+        if ( !($host{"timeout"} =~ /^\d+?$/) ) {$host{"timeout"}=200;}
+        my $query = "UPDATE hosts SET ";
+        $query .= "host = '".$host{"host"}."', ";
+        $query .= "parent_id = ".$host{"parentId"}.", ";
+        $query .= "status = ".$host{"status"}.", ";
+        $query .= "method = '".$host{"method"}."', ";
+        $query .= "port = ".$host{"port"}.", ";
+        $query .= "attempts = ".$host{"attempts"}.", ";
+        $query .= "timeout = ".$host{"timeout"}.", ";
+        $query .= "comment = '".$host{"comment"}."' ";
+        $query .= "WHERE id=".$host{"id"}.";";
+        return $dbh->do($query);
+    }
 }
 1;
