@@ -40,6 +40,7 @@ my $db = PMySQL->new(
 # Open output
 my $ui = PDraw->new();
 
+#my %host = ();
 my $title = $config->val('Web', 'title');
 my $refresh = 0;
 my $action = $queryCGI->param('action');
@@ -48,7 +49,7 @@ my $hostId = $queryCGI->param('host_id');
 my $editMode = $queryCGI->cookie('EDIT_MODE');
 my $hash;
 my $cookie;
-my $message="Nothing interesting";
+my $message = "Nothing interesting";
 
 switch ($action)
 {
@@ -126,13 +127,7 @@ switch ($action)
     case "edit_host"
     {
         # Draw edit form for a folder
-        $hash = $db->getFolderList(0);
-        $ui->editHost($hostId,
-                        $db->getHostNameById($hostId),
-                        $db->getHostParentById($hostId),
-                        $hash,
-                        $db->getHostCommentById($hostId));
-        $hash->finish();
+        $ui->editHost($db->getFolderList(0), $db->getHostById($hostId));
     }
     else
     {

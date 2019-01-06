@@ -99,6 +99,31 @@ package PMySQL
         return $queryHash;
     }
 
+    # Returns named hash of a host object
+    sub getHostById
+    {
+        my($self, $id) = @_;
+        my $query = "SELECT host,parent_id,status,reply,method,port,attempts,timeout,last_test_time,last_status,status_changed,comment FROM hosts WHERE id=$id;";
+        my $queryHash = $dbh->prepare($query);
+        $self->{ITEMS_COUNT} = $queryHash->execute;
+        my @row = $queryHash->fetchrow_array();
+        $queryHash->finish;
+        my %host = ('id' => $id,
+                    'host' => $row[0],
+                    'parentId' => $row[1],
+                    'status' => $row[2],
+                    'reply' => $row[3],
+                    'method' => $row[4],
+                    'port' => $row[5],
+                    'attempts' => $row[6],
+                    'timeout' => $row[7],
+                    'lastTestTime' => $row[8],
+                    'lastStatus' => $row[9],
+                    'statusChanged' => $row[10],
+                    'comment' => $row[11]);
+        return %host;
+    }
+
     # Returns number of items in last SQL query.
     sub getItemsCount
     {

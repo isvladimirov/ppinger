@@ -248,22 +248,22 @@ package PDraw
     # Draws host edit form
     sub editHost
     {
-        my($self, $id, $name, $parentId, $foldersHash, $comment) = @_;
-        my @row = ();
-        $id or $id="New";
-        $comment or $comment="";
+        my($self, $foldersHash, %host) = @_;
+        $host{"id"} or $host{"id"} = "New";
+        $host{"comment"} or $host{"comment"} = "";
         print "<article id='pageHosts'>\n";
         print "<h1>Edit host</h1>\n";
         print "<form action='./write.pl' method='post'>\n";
         print "<table id='formEdit'>\n";
-        print "<tr><td>Host name:</td><td><input name='name' type='text' value='$name'></td></tr>\n";
-        print "<tr><td>Host ID:</td><td>$id</td></tr>\n";
+        print "<tr><td>Host name:</td><td><input name='name' type='text' value='".$host{"host"}."'></td></tr>\n";
+        print "<tr><td>Host ID:</td><td>".$host{"id"}."</td></tr>\n";
         print "<tr><td>Parent:</td>\n";
         print "<td><select name='parent_id'>\n";
         print "<option value='-1'>Root</option>\n";
+        my @row = ();
         while (@row = $foldersHash->fetchrow_array())
         {
-            if($parentId==$row[0])
+            if($host{"parentId"}==$row[0])
             {
                 print "<option selected value='$row[0]'>$row[1]</option>\n";
             }
@@ -274,16 +274,18 @@ package PDraw
         }
         print "</select></td></tr>\n";
         print "<tr><td>Method:</td><td><select name='method'>\n";
+        # TODO: Make the same as parent_id
         print "<option value='ping'>Ping</option>\n";
-        print "<option value='tcp'>TCP</option>";
-        print "<option value='udp'>UDP</option>";
+        print "<option value='tcp'>TCP</option>\n";
+        print "<option value='udp'>UDP</option>\n";
         print "</select></td></tr>\n";
-        print "<tr><td>Attempts:</td><td><input name='attempts' type='text' value='4'></td></tr>\n";
-        print "<tr><td>Timeout:</td><td><input name='timeout' type='text' value='600'></td></tr>\n";
-        print "<tr><td>Comment:</td><td><input name='comment' type='text' value='$comment'></td></tr>\n";
+        print "<tr><td>Attempts:</td><td><input name='attempts' type='text' value='".$host{"attempts"}."'></td></tr>\n";
+        print "<tr><td>Timeout:</td><td><input name='timeout' type='text' value='".$host{"timeout"}."'></td></tr>\n";
+        print "<tr><td>Comment:</td><td><input name='comment' type='text' value='".$host{"comment"}."'></td></tr>\n";
         print "<tr><td>Disable this host:</td>\n";
+        # TODO: If a status is disable then check the box
         print "<td><input type='checkbox' name='host_disable' value='1'></td></tr>\n";
-        if ($id!="New")
+        if ($host{"id"}!="New")
         {
             print "<tr><td>Delete this host:</td>\n";
             print "<td><input type='checkbox' name='delete' value='host'></td></tr>\n";
@@ -291,7 +293,7 @@ package PDraw
         print "<tr><td align='right' colspan='2'><input type='submit' value='Save'>\n";
         print "<input type='button' value='Cancel' onclick='window.history.back()' /></td></tr>\n";
         print "</table>\n";
-        print "<input type='hidden' name='host_id' value='$id'>\n";
+        print "<input type='hidden' name='host_id' value='".$host{"id"}."'>\n";
         print "</form>\n";
         print "</article>\n";
         return 1;
