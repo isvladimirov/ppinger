@@ -1,5 +1,12 @@
 #!/usr/bin/env perl
 
+#######################################
+# PPinger
+# PCore.pl
+# Web core library
+# Copyright 2018-2019 duk3L3t0
+#######################################
+
 use Switch;
 use strict;
 

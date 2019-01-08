@@ -4,11 +4,11 @@
 # PPinger
 # write.pl
 # Script for updating database
-# Copyright 2018 duk3L3t0
+# Copyright 2018-2019 duk3L3t0
 #######################################
 
 use CGI::Carp qw(warningsToBrowser fatalsToBrowser);
-use lib 'include';
+use lib "../include";
 use PDraw;
 use PMySQL;
 use CGI qw(:standard);
@@ -16,7 +16,7 @@ use Config::IniFiles;
 use Switch;
 use strict;
 
-my $config = Config::IniFiles->new( -file => "etc/ppinger.cfg" );
+my $config = Config::IniFiles->new( -file => "../etc/ppinger.cfg" );
 my $queryCGI = CGI->new();
 # Try to open database
 my $db = PMySQL->new(

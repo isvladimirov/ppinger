@@ -4,11 +4,11 @@
 # PPinger
 # index.pl
 # Point of entrance
-# Copyright 2018 duk3L3t0
+# Copyright 2018-2019 duk3L3t0
 #######################################
 
 use CGI::Carp qw(warningsToBrowser fatalsToBrowser);
-use lib "include";
+use lib "../include";
 require "PCore.pl";
 use PDraw;
 use PMySQL;
@@ -19,7 +19,7 @@ use Switch;
 use strict;
 use constant
 {
-    APP_VERSION => 0.5,
+    APP_VERSION => 0.6,
     STATUS_ALL => 0,
     STATUS_DOWN => 1,
     STATUS_ALIVE => 2,
@@ -27,7 +27,7 @@ use constant
     STATUS_DISABLED => 4,
 };
 
-my $config = Config::IniFiles->new( -file => "etc/ppinger.cfg" );
+my $config = Config::IniFiles->new( -file => "../etc/ppinger.cfg" );
 my $queryCGI = CGI->new();
 # Try to open database
 my $db = PMySQL->new(

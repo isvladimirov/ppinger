@@ -2,8 +2,9 @@
 
 #######################################
 # PPinger
+# PMySQL.pm
 # Class for accessing MySQL database
-# Copyright 2018 duk3L3t0
+# Copyright 2018-2019 duk3L3t0
 #######################################
 # Status values:
 # 0 - show all (when it's posible)
