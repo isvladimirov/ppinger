@@ -48,6 +48,13 @@ sub drawHostField
             case (STATUS_UNKNOWN)  { $row[3] = "unknown"; }
             case (STATUS_DISABLED) { $row[3] = "disabled"; }
         }
+        switch ($row[10])
+        {
+            case (STATUS_DOWN)     { $row[10] = "down"; }
+            case (STATUS_ALIVE)    { $row[10] = "alive"; }
+            case (STATUS_UNKNOWN)  { $row[10] = "unknown"; }
+            case (STATUS_DISABLED) { $row[10] = "disabled"; }
+        }
         $destinationUI->addHost($editMode, # Turn on edit mode
         $row[1],   # Hostname
         $row[0],   # Host ID

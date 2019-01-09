@@ -305,5 +305,24 @@ package PMySQL
         $query .= "WHERE id=".$host{"id"}.";";
         return $dbh->do($query);
     }
+
+    # Updates status of a host
+    sub updateHostStatus
+    {
+        my($self, $id, $status) = @_;
+        my $queryHash = $dbh->prepare("SELECT status FROM hosts WHERE id=$id;");
+        $queryHash->execute();
+        my @row = $queryHash->fetchrow_array();
+        my $query = "UPDATE hosts SET ";
+        if ( ($row[0])!=($status) )
+        {
+            $query .= "last_status=$row[0], ";
+            $query .= "status_changed=now(), ";
+            $query .= "status=$status, ";
+        }
+        $query .= "last_test_time=now() ";
+        $query .= "WHERE id=$id;";
+        return $dbh->do($query);
+    }
 }
 1;

@@ -9,7 +9,10 @@
 
 use lib "../include";
 use PMySQL;
+use PPoller;
 use Config::IniFiles;
+use Data::Validate::IP qw(is_ip);
+use Data::Validate::Domain qw(is_domain);
 use strict;
 use constant
 {
@@ -20,11 +23,16 @@ use constant
     STATUS_UNKNOWN => 3,
     STATUS_DISABLED => 4,
 };
+# Order of host check
+my @order = (STATUS_DOWN, STATUS_UNKNOWN, STATUS_ALIVE);
+my $status;
+my @row;
+my %host;
 
-!DEBUG or print "Loading settings...\n";
+print "Loading settings...\n" if DEBUG;
 my $config = Config::IniFiles->new( -file => "../etc/ppinger.cfg" );
 
-!DEBUG or print "Try to open database...\n";
+print "Try to open database...\n" if DEBUG;
 my $db = PMySQL->new(
     $config->val('SQL', 'db_host'),
     $config->val('SQL', 'db_user'),
@@ -32,14 +40,45 @@ my $db = PMySQL->new(
     $config->val('SQL', 'db_name')
 );
 
-!DEBUG or print "Polling downed hosts...\n";
-!DEBUG or print "Polling unknown hosts...\n";
-!DEBUG or print "Polling alive hosts...\n";
-#
-# TODO: Here will be main code of a poller
-#
+print "Checking hosts...\n" if DEBUG;
 
-!DEBUG or print "Closing database...\n";
+my $poller = PPoller->new();
+
+foreach $status (@order)
+{
+    my $sth = $db->getHostList(0, $status);
+    while (@row = $sth->fetchrow_array())
+    {
+        $host{"host"} = $row[1];
+        $host{"method"} = $row[5];
+        $host{"port"} = $row[6];
+        $host{"attempts"} = $row[7];
+        $host{"timeout"} = $row[8];
+        print "Checking ".$host{"host"}." with ".$host{"method"}."... " if DEBUG;
+        if ( (is_ip($host{"host"})) || (is_domain($host{"host"})) )
+        {
+            if ( $poller->checkHost(%host) )
+            {
+                $status = STATUS_ALIVE;
+                print "[alive]\n" if DEBUG;
+            }
+            else
+            {
+                $status = STATUS_DOWN;
+                print "[down]\n" if DEBUG;
+            }
+        }
+        else
+        {
+            $status = STATUS_DISABLED;
+            print "[wrong IP address] This host will be disabled.\n" if DEBUG;
+        }
+        $db->updateHostStatus($row[0], $status);
+    }
+    $sth->finish();
+}
+
+print "Closing database...\n" if DEBUG;
 $db->DESTROY();
 
 !DEBUG or print "Exit.\n";

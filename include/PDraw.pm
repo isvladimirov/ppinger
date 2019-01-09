@@ -182,7 +182,7 @@ package PDraw
         print "<td>$status</td>\n";
         print "<td>$reply ms</td>\n";
         print "<td>$ltt</td>\n";
-        print "<td>unknown</td>\n";
+        print "<td>$lastStatus</td>\n";
         print "<td id='mainTableComment'>$comment</td>\n";
         print "<td>$statusChanged</td>\n";
         print "</tr>\n";
@@ -300,6 +300,14 @@ package PDraw
         else
         {
             print "<option value='udp'>UDP</option>\n";
+        }
+        if ($host{"method"} eq "external")
+        {
+            print "<option selected value='external'>External</option>\n";
+        }
+        else
+        {
+            print "<option value='external'>External</option>\n";
         }
         print "</select></td></tr>\n";
         print "<tr><td>Port:</td><td><input name='port' type='text' value='".$host{"port"}."'></td></tr>\n";
