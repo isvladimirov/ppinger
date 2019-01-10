@@ -28,6 +28,7 @@ my @order = (STATUS_DOWN, STATUS_UNKNOWN, STATUS_ALIVE);
 my $status;
 my @row;
 my %host;
+my $reply;
 
 print "Loading settings...\n" if DEBUG;
 my $config = Config::IniFiles->new( -file => "../etc/ppinger.cfg" );
@@ -54,10 +55,12 @@ foreach $status (@order)
         $host{"port"} = $row[6];
         $host{"attempts"} = $row[7];
         $host{"timeout"} = $row[8];
+        $host{"command"} = $row[13];
         print "Checking ".$host{"host"}." with ".$host{"method"}."... " if DEBUG;
         if ( (is_ip($host{"host"})) || (is_domain($host{"host"})) )
         {
-            if ( $poller->checkHost(%host) )
+            ($status, $reply) = $poller->checkHost(%host);
+            if ( $status )
             {
                 $status = STATUS_ALIVE;
                 print "[alive]\n" if DEBUG;
@@ -71,9 +74,9 @@ foreach $status (@order)
         else
         {
             $status = STATUS_DISABLED;
-            print "[wrong IP address] This host will be disabled.\n" if DEBUG;
+            print "[wrong address] This host will be disabled.\n" if DEBUG;
         }
-        $db->updateHostStatus($row[0], $status);
+        $db->updateHostStatus($row[0], $status, $reply);
     }
     $sth->finish();
 }
@@ -81,6 +84,6 @@ foreach $status (@order)
 print "Closing database...\n" if DEBUG;
 $db->DESTROY();
 
-!DEBUG or print "Exit.\n";
+print "Exit.\n" if DEBUG;
 # End of main function
 1;

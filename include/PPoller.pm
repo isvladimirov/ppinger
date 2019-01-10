@@ -29,7 +29,9 @@ package PPoller
     {
         my($self, %host) = @_;
         my($i, $p);
-        my $status = 0;
+        my $status = undef;
+        my $avail; # Availability
+        my $dur;   # Duration
         switch ($host{"method"})
         {
             case "ping"
@@ -37,28 +39,57 @@ package PPoller
                 $p = Net::Ping->new("icmp");
                 for ($i = 0; $i<$host{"attempts"}; $i++)
                 {
-                    if ($p->ping($host{"host"}, $host{"timeout"}/1000))
+                    ($avail, $dur) = $p->ping($host{"host"}, $host{"timeout"}/1000);
+                    if ($avail)
                     {
                         $status = 1;
                         last;
                     }
                 }
                 $p->close;
+                $dur *= 1000; # Convert seconds to milliseconds
             }
             case "tcp"
             {
-                # TODO: Realise tcp check
+                $p = Net::Ping->new("tcp");
+                $p->port_number($host{"port"});
+                for ($i = 0; $i<$host{"attempts"}; $i++)
+                {
+                    ($avail, $dur) = $p->ping($host{"host"}, $host{"timeout"}/1000);
+                    if ($avail)
+                    {
+                        $status = 1;
+                        last;
+                    }
+                }
+                $p->close;
+                $dur *= 1000; # Convert seconds to milliseconds
             }
             case "udp"
             {
-                # TODO: Realise udp check
+                $p = Net::Ping->new("udp");
+                $p->port_number($host{"port"});
+                for ($i = 0; $i<$host{"attempts"}; $i++)
+                {
+                    ($avail, $dur) = $p->ping($host{"host"}, $host{"timeout"}/1000);
+                    if ($avail)
+                    {
+                        $status = 1;
+                        last;
+                    }
+                }
+                $p->close;
+                $dur *= 1000; # Convert seconds to milliseconds
             }
             case "external"
             {
-                # TODO: Realise a check with external scripts
+                if ($host{"command"})
+                {
+                    ($status, $dur) = split (' ', `$host{"command"} $host{"host"}`);
+                }
             }
         }
-        return $status;
+        return ($status, $dur);
     }
 }
 1;

@@ -86,6 +86,7 @@ package PMySQL
     # 10 - last_status
     # 11 - status_changed
     # 12 - comment
+    # 13 - command
     sub getHostList
     {
         my($self, $parent, $status) = @_;
@@ -94,7 +95,7 @@ package PMySQL
         if ( ($where) && ($status) ) { $where = $where . " and"; }
         if ($status) { $where = $where . " status=$status"; }
         if ($where) { $where = "WHERE" . $where; }
-        my $query = "SELECT id,host,parent_id,status,reply,method,port,attempts,timeout,last_test_time,last_status,status_changed,comment FROM hosts $where ORDER BY status, host;";
+        my $query = "SELECT id,host,parent_id,status,reply,method,port,attempts,timeout,last_test_time,last_status,status_changed,comment,command FROM hosts $where ORDER BY status, host;";
         my $queryHash = $dbh->prepare($query);
         $self->{ITEMS_COUNT} = $queryHash->execute;
         return $queryHash;
@@ -301,7 +302,8 @@ package PMySQL
         $query .= "port = ".$host{"port"}.", ";
         $query .= "attempts = ".$host{"attempts"}.", ";
         $query .= "timeout = ".$host{"timeout"}.", ";
-        $query .= "comment = '".$host{"comment"}."' ";
+        $query .= "comment = '".$host{"comment"}."', ";
+        $query .= "status_changed=now() ";
         $query .= "WHERE id=".$host{"id"}.";";
         return $dbh->do($query);
     }
@@ -309,7 +311,7 @@ package PMySQL
     # Updates status of a host
     sub updateHostStatus
     {
-        my($self, $id, $status) = @_;
+        my($self, $id, $status, $reply) = @_;
         my $queryHash = $dbh->prepare("SELECT status FROM hosts WHERE id=$id;");
         $queryHash->execute();
         my @row = $queryHash->fetchrow_array();
@@ -320,6 +322,7 @@ package PMySQL
             $query .= "status_changed=now(), ";
             $query .= "status=$status, ";
         }
+        if ($reply) {$query .= "reply=$reply, ";}
         $query .= "last_test_time=now() ";
         $query .= "WHERE id=$id;";
         return $dbh->do($query);
