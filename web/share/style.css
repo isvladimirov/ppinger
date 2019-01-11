@@ -96,6 +96,11 @@ header, nav, article, footer {
     border: 0;
     background-color: #999999;
 }
+#mainTableRowUnknown {
+    text-align: center;
+    border: 0;
+    background-color: #C0BE40;
+}
 #mainTableDataHost {
     text-align: left;
     padding-left: 3px;
@@ -150,4 +155,41 @@ h1 {
 img {
     vertical-align: middle;
 }
-
+div#showHostWholeBlock:before,
+div#showHostWholeBlock:after {
+    content: " ";
+    display: table;
+}
+div#showHostWholeBlock:after {
+    clear: both;
+}
+div#showHostWholeBlock {
+    width: 100%;
+}
+div#showHostBlock {
+    float: left;
+    width: 50%;
+    min-width: 440px;
+    margin-bottom: 20px;
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 0;
+}
+div#showHostBlockHeader {
+    font-weight: bold;
+    margin-bottom: 0;
+    margin-left: 20px;
+    margin-right: 20px;
+    margin-top: 0;
+    padding: 2px;
+    background-color: #56A8FF;
+}
+ul#showHostBlock {
+    list-style-image: none;
+    list-style-type: none;
+    margin-bottom: 0;
+    margin-left: 20px;
+    margin-right: 20px;
+    margin-top: 0;
+    padding: 2px;
+}

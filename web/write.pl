@@ -79,6 +79,7 @@ elsif ($host{"id"} =~ /^\d+?$/)
     $host{"attempts"} = $queryCGI->param('attempts');
     $host{"timeout"} = $queryCGI->param('timeout');
     $host{"comment"} = $queryCGI->param('comment');
+    $host{"command"} = $queryCGI->param('command');
     if ($queryCGI->param('host_disable')) {$host{"status"} = 4;}
     else {$host{"status"} = 3;}
     $db->updateHost(%host);

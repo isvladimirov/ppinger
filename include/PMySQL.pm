@@ -105,7 +105,7 @@ package PMySQL
     sub getHostById
     {
         my($self, $id) = @_;
-        my $query = "SELECT host,parent_id,status,reply,method,port,attempts,timeout,last_test_time,last_status,status_changed,comment FROM hosts WHERE id=$id;";
+        my $query = "SELECT host,parent_id,status,reply,method,port,attempts,timeout,last_test_time,last_status,status_changed,comment,command FROM hosts WHERE id=$id;";
         my $queryHash = $dbh->prepare($query);
         $self->{ITEMS_COUNT} = $queryHash->execute;
         my @row = $queryHash->fetchrow_array();
@@ -122,7 +122,8 @@ package PMySQL
                     'lastTestTime' => $row[8],
                     'lastStatus' => $row[9],
                     'statusChanged' => $row[10],
-                    'comment' => $row[11]);
+                    'comment' => $row[11],
+                    'command' => $row[12]);
         return %host;
     }
 
@@ -303,6 +304,7 @@ package PMySQL
         $query .= "attempts = ".$host{"attempts"}.", ";
         $query .= "timeout = ".$host{"timeout"}.", ";
         $query .= "comment = '".$host{"comment"}."', ";
+        $query .= "command = '".$host{"command"}."', ";
         $query .= "status_changed=now() ";
         $query .= "WHERE id=".$host{"id"}.";";
         return $dbh->do($query);
@@ -322,10 +324,19 @@ package PMySQL
             $query .= "status_changed=now(), ";
             $query .= "status=$status, ";
         }
-        if ($reply) {$query .= "reply=$reply, ";}
+        if ($reply =~ /^\d+?$/) {$query .= "reply=$reply, ";}
         $query .= "last_test_time=now() ";
         $query .= "WHERE id=$id;";
         return $dbh->do($query);
+    }
+
+    # Returns a hash of host logs list
+    sub getHostLogs
+    {
+        my($self, $id) = @_;
+        my $queryHash = $dbh->prepare("SELECT id,status,time FROM logs WHERE host_id=$id ORDER BY time DESC;");
+        $self->{ITEMS_COUNT} = $queryHash->execute;
+        return $queryHash;
     }
 }
 1;

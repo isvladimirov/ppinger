@@ -49,7 +49,7 @@ my $hostId = $queryCGI->param('host_id');
 my $editMode = $queryCGI->cookie('EDIT_MODE');
 my $hash;
 my $cookie;
-my $message = "Nothing interesting";
+my $message = "Some additional information";
 
 switch ($action)
 {
@@ -64,7 +64,6 @@ switch ($action)
             $action = "view";
             $refresh = $config->val('Web', 'refresh');
             $title .= " :: View mode";
-            $message = "Edit mode is turned off";
         }
         else
         {
@@ -72,7 +71,6 @@ switch ($action)
             $cookie = new CGI::Cookie(-name=>'EDIT_MODE',-value=>'1');
             $editMode = 1;
             $title = $title . " :: Configuration mode";
-            $message = "Edit mode is turned on";
         }
     }
     case "edit_folder"
@@ -84,6 +82,11 @@ switch ($action)
     {
         $editMode = 1;
         $title = $title . " :: Edit host";
+    }
+    case "show_host"
+    {
+        $editMode = 0;
+        $title = $title . " :: Show host";
     }
     else
     {
@@ -126,8 +129,15 @@ switch ($action)
     }
     case "edit_host"
     {
-        # Draw edit form for a folder
+        # Draw edit form for a host
         $ui->editHost($db->getFolderList(0), $db->getHostById($hostId));
+    }
+    case "show_host"
+    {
+        # Draw host details
+        $hash = $db->getHostLogs($hostId);
+        $ui->showHost($db->getHostById($hostId), $hash);
+        #$hash->finish();
     }
     else
     {

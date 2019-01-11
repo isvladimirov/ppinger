@@ -170,6 +170,7 @@ package PDraw
         {
             case "down" { $tableRowId = "mainTableRowBad"; }
             case "disabled" { $tableRowId = "mainTableRowDisabled"; }
+            case "unknown" { $tableRowId = "mainTableRowUnknown"; }
         }
         print "<tr id='$tableRowId'>\n";
         if ($need_edit)
@@ -178,7 +179,7 @@ package PDraw
             print "<img width='16' src='share/edit-text-frame-update.svg' alt='Edit this host'>";
             print "</a></td>\n";
         }
-        print "<td id='mainTableDataHost'>$name</td>\n";
+        print "<td id='mainTableDataHost'><a href='./index.pl?action=show_host&host_id=$id'>$name</a></td>\n";
         print "<td>$status</td>\n";
         print "<td>$reply ms</td>\n";
         print "<td>$ltt</td>\n";
@@ -323,6 +324,7 @@ package PDraw
         {
             print "<td><input type='checkbox' name='host_disable' value='1'></td></tr>\n";
         }
+        print "<tr><td>External script:</td><td><input name='command' type='text' value='".$host{"command"}."'></td></tr>\n";
         if ($host{"id"}!="New")
         {
             print "<tr><td>Delete this host:</td>\n";
@@ -333,6 +335,54 @@ package PDraw
         print "</table>\n";
         print "<input type='hidden' name='host_id' value='".$host{"id"}."'>\n";
         print "</form>\n";
+        print "</article>\n";
+        return 1;
+    }
+
+    # Shows host details
+    sub showHost
+    {
+        my($self, %host, $logs, $maxLines) = @_;
+        print "<article id='pageHosts'>\n";
+        print "<h1>Host details</h1>\n";
+
+        print "<div id='showHostWholeBlock'>\n";
+
+        print "<div id='showHostBlock'>\n";
+        print "<div id='showHostBlockHeader'>General information</div>\n";
+        print "<ul id='showHostBlock'>\n";
+        print "<li>Hostname: ".$host{"host"}."</li>\n";
+        print "<li>ID: ".$host{"id"}."</li>\n";
+        print "<li>Comment: ".$host{"comment"}."</li>\n";
+        print "</ul>\n</div>\n";
+        
+        print "<div id='showHostBlock'>\n";
+        print "<div id='showHostBlockHeader'>Test properties</div>\n";
+        print "<ul id='showHostBlock'>\n";
+        print "<li>Test type: ".$host{"method"}."</li>\n";
+        print "<li>Port: ".$host{"port"}."</li>\n";
+        print "<li>External script: ".$host{"command"}."</li>\n";
+        print "</ul>\n</div>\n";
+        
+        print "<div id='showHostBlock'>\n";
+        print "<div id='showHostBlockHeader'>Status</div>\n";
+        print "<ul id='showHostBlock'>\n";
+        print "<li>Current status: ".$host{"status"}."</li>\n";
+        print "<li>Last status change: ".$host{"statusChanged"}."</li>\n";
+        print "</ul>\n</div>\n";
+
+        print "<div id='showHostBlock'>\n";
+        print "<div id='showHostBlockHeader'>Last events</div>\n";
+        print "<ul id='showHostBlock'>\n";
+        print "<li>Example 1</li>\n";
+        print "<li>Example 2</li>\n";
+        print "<li>Example 3</li>\n";
+        print "<li>Example 4</li>\n";
+        print "<li>Example 5</li>\n";
+        print "</ul>\n</div>\n";
+
+        print "</div>\n";
+
         print "</article>\n";
         return 1;
     }
