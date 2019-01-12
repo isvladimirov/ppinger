@@ -313,13 +313,14 @@ package PMySQL
     # Updates status of a host
     sub updateHostStatus
     {
-        my($self, $id, $status, $reply) = @_;
+        my($self, $id, $status, $reply, $limit) = @_;
         my $queryHash = $dbh->prepare("SELECT status FROM hosts WHERE id=$id;");
         $queryHash->execute();
         my @row = $queryHash->fetchrow_array();
         my $query = "UPDATE hosts SET ";
         if ( ($row[0])!=($status) )
         {
+            $self->insertLog($id, $status, $limit);
             $query .= "last_status=$row[0], ";
             $query .= "status_changed=now(), ";
             $query .= "status=$status, ";
@@ -337,6 +338,29 @@ package PMySQL
         my $queryHash = $dbh->prepare("SELECT id,status,time FROM logs WHERE host_id=$id ORDER BY time DESC;");
         $self->{ITEMS_COUNT} = $queryHash->execute;
         return $queryHash;
+    }
+
+    # Inserts event in logs
+    sub insertLog
+    {
+        my($self, $id, $status, $limit) = @_;
+        $limit or $limit = 5;
+        my $queryHash = $dbh->prepare("SELECT count(*) FROM logs WHERE host_id=$id;");
+        $queryHash->execute();
+        my @row = $queryHash->fetchrow_array();
+        if ( $row[0]>$limit )
+        {
+            $limit = $row[0] - $limit + 1;
+            $dbh->do("DELETE FROM logs WHERE host_id=$id ORDER BY time LIMIT $limit");
+        }
+        return $dbh->do("INSERT INTO logs set host_id=$id, status=$status;");
+    }
+
+    # Clears logs of a host
+    sub deleteLogs
+    {
+        my($self, $id) = @_;
+        return $dbh->do("DELETE FROM logs WHERE id=$id;");
     }
 }
 1;

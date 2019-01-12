@@ -19,7 +19,7 @@ use Switch;
 use strict;
 use constant
 {
-    APP_VERSION => 0.6,
+    APP_VERSION => 0.7,
     STATUS_ALL => 0,
     STATUS_DOWN => 1,
     STATUS_ALIVE => 2,
@@ -135,9 +135,7 @@ switch ($action)
     case "show_host"
     {
         # Draw host details
-        $hash = $db->getHostLogs($hostId);
-        $ui->showHost($db->getHostById($hostId), $hash);
-        #$hash->finish();
+        $ui->showHost($db->getHostLogs($hostId), $db->getHostById($hostId));
     }
     else
     {

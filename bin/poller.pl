@@ -76,7 +76,7 @@ foreach $status (@order)
             $status = STATUS_DISABLED;
             print "[wrong address] This host will be disabled.\n" if DEBUG;
         }
-        $db->updateHostStatus($row[0], $status, $reply);
+        $db->updateHostStatus($row[0], $status, $reply, $config->val('Poller', 'max_log_count'));
     }
     $sth->finish();
 }

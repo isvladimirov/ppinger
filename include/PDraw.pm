@@ -22,6 +22,12 @@ package PDraw
     use utf8;
     use CGI qw(-utf8);
 
+    my %statusName = ( 1 => "Down",
+                       2 => "Alive",
+                       3 => "Unknown",
+                       4 => "Disabled",
+                     );
+
     sub new
     {
         my($class) = @_;
@@ -342,12 +348,16 @@ package PDraw
     # Shows host details
     sub showHost
     {
-        my($self, %host, $logs, $maxLines) = @_;
+        my($self, $logs, %host) = @_;
+        my %liID = ( 1 => "statusDown",
+                     2 => "statusAlive",
+                     3 => "statusUnknown",
+                     4 => "statusDisabled",
+                   );
+        $host{"command"} or $host{"command"}="None set";
         print "<article id='pageHosts'>\n";
         print "<h1>Host details</h1>\n";
-
         print "<div id='showHostWholeBlock'>\n";
-
         print "<div id='showHostBlock'>\n";
         print "<div id='showHostBlockHeader'>General information</div>\n";
         print "<ul id='showHostBlock'>\n";
@@ -355,34 +365,31 @@ package PDraw
         print "<li>ID: ".$host{"id"}."</li>\n";
         print "<li>Comment: ".$host{"comment"}."</li>\n";
         print "</ul>\n</div>\n";
-        
         print "<div id='showHostBlock'>\n";
         print "<div id='showHostBlockHeader'>Test properties</div>\n";
         print "<ul id='showHostBlock'>\n";
         print "<li>Test type: ".$host{"method"}."</li>\n";
         print "<li>Port: ".$host{"port"}."</li>\n";
         print "<li>External script: ".$host{"command"}."</li>\n";
+        print "<li>Attempts: ".$host{"attempts"}."</li>\n";
+        print "<li>Timeout: ".$host{"timeout"}." ms</li>\n";
         print "</ul>\n</div>\n";
-        
         print "<div id='showHostBlock'>\n";
         print "<div id='showHostBlockHeader'>Status</div>\n";
         print "<ul id='showHostBlock'>\n";
-        print "<li>Current status: ".$host{"status"}."</li>\n";
+        print "<li>Current status: ".$statusName{$host{"status"}}."</li>\n";
         print "<li>Last status change: ".$host{"statusChanged"}."</li>\n";
         print "</ul>\n</div>\n";
-
         print "<div id='showHostBlock'>\n";
         print "<div id='showHostBlockHeader'>Last events</div>\n";
         print "<ul id='showHostBlock'>\n";
-        print "<li>Example 1</li>\n";
-        print "<li>Example 2</li>\n";
-        print "<li>Example 3</li>\n";
-        print "<li>Example 4</li>\n";
-        print "<li>Example 5</li>\n";
+        my @row = ();
+        while (@row = $logs->fetchrow_array())
+        {
+            print "<li id='".$liID{$row[1]}."'>Status ".$statusName{$row[1]}." set at $row[2]</li>\n";
+        }
         print "</ul>\n</div>\n";
-
         print "</div>\n";
-
         print "</article>\n";
         return 1;
     }
