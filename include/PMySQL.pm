@@ -362,5 +362,18 @@ package PMySQL
         my($self, $id) = @_;
         return $dbh->do("DELETE FROM logs WHERE id=$id;");
     }
+
+    # Returns count of host with given status in a folder ('0' means all folders)
+    sub countHostStatus
+    {
+        my($self, $status, $parent) = @_;
+        my $query;
+        if ($parent) { $query = "SELECT count(*) FROM hosts WHERE status=$status AND parent_id=$parent;" }
+        else { $query = "SELECT count(*) FROM hosts WHERE status=$status;" }
+        my $queryHash = $dbh->prepare($query);
+        $queryHash->execute();
+        my @row = $queryHash->fetchrow_array();
+        return $row[0];
+    }
 }
 1;

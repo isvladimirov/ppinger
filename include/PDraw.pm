@@ -364,6 +364,7 @@ package PDraw
         print "<li>Hostname: ".$host{"host"}."</li>\n";
         print "<li>ID: ".$host{"id"}."</li>\n";
         print "<li>Comment: ".$host{"comment"}."</li>\n";
+        print "<li><input type='button' value='Edit this host' onclick='window.location=\"./index.pl?action=edit_host&host_id=".$host{"id"}."\";' /></li>\n";
         print "</ul>\n</div>\n";
         print "<div id='showHostBlock'>\n";
         print "<div id='showHostBlockHeader'>Test properties</div>\n";
