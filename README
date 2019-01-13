@@ -1,0 +1,33 @@
+ABOUT
+=====
+
+PPinger is a simple web-based network monitoring tool written on Perl.
+This software is open source. It's provided as is. The author doesn't
+response for any lost profits or damage caused by this software.
+Written by duk3L3t0 (2018-2019).
+
+LINKS
+=====
+
+Home page . . . . . . . https://bitbucket.org/duk3L3t0/ppinger/
+Email . . . . . . . . . luiseal.mail@gmail.com
+
+REQUIREMENTS
+============
+
+1. Web server
+2. MySQL server
+3. Perl5
+
+INSTALL
+=======
+
+1. Setup your web server
+1.1. Set ppinger/web as a document root.
+1.2. Make *.pl files executable via mod_perl or cgi-bin.
+1.3. Install modules that allow to work with MySQL.
+2. Setup MySQL server.
+3. Set installation path to the startup script ppinger/bin/poller.sh
+4. Add this script to /etc/crontab:
+
+* * * * * root /path_to_app/ppinger/bin/poller.sh > /dev/null
