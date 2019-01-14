@@ -9,6 +9,14 @@
 
 use Switch;
 use strict;
+use constant
+{
+    STATUS_ALL => 0,
+    STATUS_DOWN => 1,
+    STATUS_ALIVE => 2,
+    STATUS_UNKNOWN => 3,
+    STATUS_DISABLED => 4,
+};
 
 # List of available functions
 sub drawFolderField; # Recursive function for drawing folder tree
@@ -17,11 +25,28 @@ sub drawHostField;   # Recursive function for drawing hosts
 sub drawFolderField
 {
     my ($sourceDB, $destinationUI, $parent, $level, $folderId, $editMode) = @_;
+    my %hostStatus = ();
+    my $folderStatus;
     my @row = ();
     my $sth = $sourceDB->getFolderList($parent);
     while (@row = $sth->fetchrow_array)
     {
-        $destinationUI->addFolder($editMode, $row[1], $row[0], $level, 0, $folderId);
+        %hostStatus = ( "down"    => $sourceDB->countHostStatus(STATUS_DOWN, $row[0]),
+                        "alive"   => $sourceDB->countHostStatus(STATUS_ALIVE, $row[0]),
+                        "unknown" => $sourceDB->countHostStatus(STATUS_UNKNOWN, $row[0]),
+                      );
+        $row[1] .= " (".$hostStatus{"alive"};
+        $row[1] .= "/".$hostStatus{"down"};
+        $row[1] .= "/".$hostStatus{"unknown"}.")";
+        if ($hostStatus{"down"}>0) { $folderStatus = 1; }
+        else { undef $folderStatus; }
+        $destinationUI->addFolder($editMode,      # '1' - edit mode is on
+                                  $row[1],        # Folder name
+                                  $row[0],        # Folder ID
+                                  $level,         # Folder level
+                                  0,              # Is this folder last. Doesn't use.
+                                  $folderId,      # ID of current folder
+                                  $folderStatus); # Status of hosts in folder
         drawFolderField($sourceDB, $destinationUI, $row[0], $level+1, $folderId, $editMode);
     }
     $sth->finish();
@@ -31,6 +56,7 @@ sub drawFolderField
 sub drawHostField
 {
     my ($sourceDB, $destinationUI, $parent, $isRecursive, $editMode) = @_;
+    my %hostStatus = ();
     my @row = ();
     if (($parent==0)&&($isRecursive))
     {
@@ -73,6 +99,13 @@ sub drawHostField
         $sth = $sourceDB->getFolderList($parent);
         while (@row = $sth->fetchrow_array)
         {
+            %hostStatus = ( "down"    => $sourceDB->countHostStatus(STATUS_DOWN, $row[0]),
+                            "alive"   => $sourceDB->countHostStatus(STATUS_ALIVE, $row[0]),
+                            "unknown" => $sourceDB->countHostStatus(STATUS_UNKNOWN, $row[0]),
+                           );
+            $row[1] .= " (".$hostStatus{"alive"};
+            $row[1] .= "/".$hostStatus{"down"};
+            $row[1] .= "/".$hostStatus{"unknown"}.")";   
             $destinationUI->addHostSeparator($row[1]);
             drawHostField($sourceDB, $destinationUI, $row[0], $isRecursive, $editMode);
         }

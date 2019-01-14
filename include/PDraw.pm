@@ -41,7 +41,7 @@ package PDraw
 
     sub addHeader
     {
-        my($self, $title, $refresh, $cookie) = @_;
+        my($self, $title, $refresh, $cookie, %hostStatus) = @_;
         my $queryCGI = CGI->new();
         if ($cookie)
         {
@@ -67,8 +67,17 @@ package PDraw
         my $now_string = strftime "%a %e %b %Y %H:%M:%S", localtime;
         print "Page loaded at $now_string\n";
         print "</div>\n";
+
+        print "<div id='pageHeaderStatus'>\n";
+        print "Total hosts: $hostStatus{'total'}<br>\n";
+        print "<font color='green'>Alive: $hostStatus{'alive'}</font><br>\n";
+        print "<font color='red'>Down: $hostStatus{'down'}</font><br>\n";
+        print "<font color='orange'>Unknown: $hostStatus{'unknown'}</font><br>\n";
+        print "</div>\n";
+
         print "<div id='pageHeaderRight'>\n";
-        print "<a href='./index.pl?action=edit'><img width='32' src='share/edit-text-frame-update.svg' alt='Enter edit mode'></a>\n";
+        print "<a href='./index.pl?action=show_log'><img width='32' src='share/logs.svg' alt='Show quick logs'></a>\n";
+        print "<a href='./index.pl?action=edit'><img width='32' src='share/configure.svg' alt='Enter edit mode'></a>\n";
         print "</div>\n";
         print "</header>\n";
         return 1;
@@ -107,9 +116,11 @@ package PDraw
 
     sub addFolder
     {
-        my($self, $need_edit, $name, $id, $level, $isLast, $checked_id) = @_;
+        my($self, $need_edit, $name, $id, $level, $isLast, $checked_id, $isBad) = @_;
         my $editButtons = "";
         my $prefix= "";
+        my $image = "share/folder-green.svg";
+        if ($isBad) { $image = "share/folder-red.svg"; }
         for (my $i=0; $i<$level; $i++)
         {
             $prefix.="<img width='8' src='share/level.svg' alt=''>";
@@ -132,7 +143,7 @@ package PDraw
         {
             print "<li id='folderItem'>$prefix";
         }
-        print "<img width='16' src='share/folder-green.svg'>$editButtons";
+        print "<img width='16' src='$image'>$editButtons";
         # Link to show current folder
         print "<a href='index.pl?folder_id=$id'>$name</a></li>\n";
         return 1;
@@ -387,7 +398,7 @@ package PDraw
         my @row = ();
         while (@row = $logs->fetchrow_array())
         {
-            print "<li id='".$liID{$row[1]}."'>Status ".$statusName{$row[1]}." set at $row[2]</li>\n";
+            print "<li id='".$liID{$row[1]}."'>Status ".$statusName{$row[1]}." appeared at $row[2]</li>\n";
         }
         print "</ul>\n</div>\n";
         print "</div>\n";

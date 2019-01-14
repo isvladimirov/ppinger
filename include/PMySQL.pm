@@ -367,9 +367,9 @@ package PMySQL
     sub countHostStatus
     {
         my($self, $status, $parent) = @_;
-        my $query;
-        if ($parent) { $query = "SELECT count(*) FROM hosts WHERE status=$status AND parent_id=$parent;" }
-        else { $query = "SELECT count(*) FROM hosts WHERE status=$status;" }
+        my $query="SELECT count(*) FROM hosts;";
+        if ( $status ) { $query = "SELECT count(*) FROM hosts WHERE status=$status;"; }
+        if ( $status && $parent ) { $query = "SELECT count(*) FROM hosts WHERE status=$status AND parent_id=$parent;"; }
         my $queryHash = $dbh->prepare($query);
         $queryHash->execute();
         my @row = $queryHash->fetchrow_array();

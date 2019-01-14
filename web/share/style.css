@@ -24,6 +24,13 @@ header, nav, article, footer {
 #pageHeaderLeft {
     float: left;
     padding: 0;
+    margin-right: 50px;
+}
+#pageHeaderStatus {
+    float: left;
+    font-size: 9pt;
+    margin-right: 50px;
+    padding: 0;
 }
 #pageHeaderRight {
     float: right;
@@ -58,6 +65,7 @@ header, nav, article, footer {
 }
 #mainTableHeaderHost {
     text-align: left;
+    width: 200px;
     padding-left: 3px;
 }
 #mainTableHeaderStatus {
@@ -74,7 +82,6 @@ header, nav, article, footer {
 }
 #mainTableHeaderCom {
     text-align: left;
-    width: 300px;
     padding-left: 3px;
 }
 #mainTableHeaderSC {

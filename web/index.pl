@@ -19,7 +19,7 @@ use Switch;
 use strict;
 use constant
 {
-    APP_VERSION => 0.7,
+    APP_VERSION => "0.8 (developing)",
     STATUS_ALL => 0,
     STATUS_DOWN => 1,
     STATUS_ALIVE => 2,
@@ -39,8 +39,6 @@ my $db = PMySQL->new(
 
 # Open output
 my $ui = PDraw->new();
-
-#my %host = ();
 my $title = $config->val('Web', 'title');
 my $refresh = 0;
 my $action = $queryCGI->param('action');
@@ -49,7 +47,12 @@ my $hostId = $queryCGI->param('host_id');
 my $editMode = $queryCGI->cookie('EDIT_MODE');
 my $hash;
 my $cookie;
-my $message = "Some additional information";
+my %hostStatus = ( "total"    => $db->countHostStatus(),
+                   "down"     => $db->countHostStatus(STATUS_DOWN),
+                   "alive"    => $db->countHostStatus(STATUS_ALIVE),
+                   "unknown"  => $db->countHostStatus(STATUS_UNKNOWN),
+                   "disabled" => $db->countHostStatus(STATUS_DISABLED),
+                 );
 
 switch ($action)
 {
@@ -108,7 +111,7 @@ $folderId =~ /^\d+?$/ or $folderId = 0;
 $hostId =~ /^\d+?$/ or $hostId = 0;
 
 # Draw header
-$ui->addHeader($title, $refresh, $cookie);
+$ui->addHeader($title, $refresh, $cookie, %hostStatus);
 
 # Draw folders
 $ui->openFolders($editMode);
@@ -147,7 +150,12 @@ switch ($action)
 }
 
 # Draw footer
-$ui->addFooter("PPinger v".(APP_VERSION)." | Разрабатываемая версия | $message");
+my $message = "PPinger v".(APP_VERSION);
+$message .= " | Total hosts: ".$hostStatus{"total"};
+$message .= " | Alive: ".$hostStatus{"alive"};
+$message .= " | Down: ".$hostStatus{"down"};
+$message .= " | Unknown: ".$hostStatus{"unknown"};
+$ui->addFooter($message);
 
 # Close database
 $db->DESTROY;
