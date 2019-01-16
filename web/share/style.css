@@ -17,6 +17,9 @@ header, nav, article, footer {
     padding: 10px;
     background: #D9D8D9;
 }
+li {
+    padding-left: 3px;
+}
 #pageHeader {
     grid-area: header;
     padding: 10px;
@@ -172,6 +175,8 @@ div#showHostWholeBlock:after {
 }
 div#showHostWholeBlock {
     width: 100%;
+    margin-bottom: 20px;
+    margin-top: 20px;
 }
 div#showHostBlock {
     float: left;
@@ -188,7 +193,7 @@ div#showHostBlockHeader {
     margin-left: 20px;
     margin-right: 20px;
     margin-top: 0;
-    padding: 2px;
+    padding: 3px;
     background-color: #56A8FF;
 }
 ul#showHostBlock {

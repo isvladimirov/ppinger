@@ -27,6 +27,11 @@ use constant
     STATUS_DISABLED => 4,
 };
 
+my %statusName = ( 1 => "down",
+                   2 => "alive",
+                   3 => "unknown",
+                   4 => "disabled",
+                 );
 my $config = Config::IniFiles->new( -file => "../etc/ppinger.cfg" );
 my $queryCGI = CGI->new();
 # Try to open database
@@ -89,7 +94,12 @@ switch ($action)
     case "show_host"
     {
         $editMode = 0;
-        $title = $title . " :: Show host";
+        $title = $title . " :: Host details";
+    }
+    case "show_logs"
+    {
+        $editMode = 0;
+        $title = $title . " :: Quick logs";
     }
     else
     {
@@ -140,6 +150,19 @@ switch ($action)
         # Draw host details
         $ui->showHost($db->getHostLogs($hostId), $db->getHostById($hostId));
     }
+    case  "show_logs"
+    {
+        # Draw quick logs
+        $ui->openLogs();
+        my @row;
+        $hash = $db->getHostLogs();
+        while ( @row = $hash->fetchrow_array() )
+        {
+            $ui->addLog("Host ".$db->getHostNameById($row[3])."$row[0] become ".$statusName{$row[1]}." at $row[2]", $row[1]);
+        }
+        $ui->closeLogs();
+    }
+    
     else
     {
         # Draw hosts

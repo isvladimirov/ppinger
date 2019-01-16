@@ -27,6 +27,11 @@ package PDraw
                        3 => "Unknown",
                        4 => "Disabled",
                      );
+    my %liID = ( 1 => "statusDown",
+                 2 => "statusAlive",
+                 3 => "statusUnknown",
+                 4 => "statusDisabled",
+               );
 
     sub new
     {
@@ -61,6 +66,7 @@ package PDraw
         print "</head>\n";
         print "<body>\n";
         print "<header id='pageHeader'>\n";
+
         print "<div id='pageHeaderLeft'>\n";
         print "$title<br>\n";
         print "Running on " . hostname() . "<br>\n";
@@ -76,9 +82,10 @@ package PDraw
         print "</div>\n";
 
         print "<div id='pageHeaderRight'>\n";
-        print "<a href='./index.pl?action=show_log'><img width='32' src='share/logs.svg' alt='Show quick logs'></a>\n";
+        print "<a href='./index.pl?action=show_logs'><img width='32' src='share/logs.svg' alt='Show quick logs'></a>\n";
         print "<a href='./index.pl?action=edit'><img width='32' src='share/configure.svg' alt='Enter edit mode'></a>\n";
         print "</div>\n";
+
         print "</header>\n";
         return 1;
     }
@@ -211,7 +218,7 @@ package PDraw
     {
         my($self, $title) = @_;
         print "<tr id='mainTableSeparator'>";
-        print "<td colspan='8'>$title</td>";
+        print "<td id='mainTableSeparator' colspan='8'>$title</td>";
         print "</tr>\n";
         return 1;
     }
@@ -219,6 +226,32 @@ package PDraw
     sub closeHosts
     {
         print "</table>\n";
+        print "</article>\n";
+        return 1;
+    }
+    
+    sub openLogs
+    {
+        my($self) = @_;
+        print "<article id='pageHosts'>\n";
+        print "<div id='showHostWholeBlock'>\n";
+        print "<div id='showHostBlockHeader'>Last 100 events</div>\n";
+        print "<ul id='showHostBlock'>\n";
+        return 1;
+    }
+    
+    sub addLog
+    {
+        my($self, $message, $status) = @_;
+        $status or $status = 2;
+        print "<li id='".$liID{$status}."'>$message</li>\n";
+        return 1;
+    }
+    
+    sub closeLogs
+    {
+        my($self) = @_;
+        print "</ul>\n</div>\n";
         print "</article>\n";
         return 1;
     }
@@ -360,14 +393,8 @@ package PDraw
     sub showHost
     {
         my($self, $logs, %host) = @_;
-        my %liID = ( 1 => "statusDown",
-                     2 => "statusAlive",
-                     3 => "statusUnknown",
-                     4 => "statusDisabled",
-                   );
         $host{"command"} or $host{"command"}="None set";
         print "<article id='pageHosts'>\n";
-        print "<h1>Host details</h1>\n";
         print "<div id='showHostWholeBlock'>\n";
         print "<div id='showHostBlock'>\n";
         print "<div id='showHostBlockHeader'>General information</div>\n";

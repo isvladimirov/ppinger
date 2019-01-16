@@ -335,7 +335,9 @@ package PMySQL
     sub getHostLogs
     {
         my($self, $id) = @_;
-        my $queryHash = $dbh->prepare("SELECT id,status,time FROM logs WHERE host_id=$id ORDER BY time DESC;");
+        my $query = "SELECT id,status,time,host_id FROM logs ORDER BY time DESC LIMIT 100;";
+        if ($id) { $query = "SELECT id,status,time FROM logs WHERE host_id=$id ORDER BY time DESC;"; }
+        my $queryHash = $dbh->prepare($query);
         $self->{ITEMS_COUNT} = $queryHash->execute;
         return $queryHash;
     }
