@@ -19,7 +19,7 @@ use Switch;
 use strict;
 use constant
 {
-    APP_VERSION => "0.8 (developing)",
+    APP_VERSION => "0.9 (developing)",
     STATUS_ALL => 0,
     STATUS_DOWN => 1,
     STATUS_ALIVE => 2,
@@ -41,7 +41,6 @@ my $db = PMySQL->new(
     $config->val('SQL', 'db_pass'),
     $config->val('SQL', 'db_name')
 ) or die("Error! Can't connect to database!");
-
 # Open output
 my $ui = PDraw->new();
 my $title = $config->val('Web', 'title');
@@ -49,6 +48,7 @@ my $refresh = 0;
 my $action = $queryCGI->param('action');
 my $folderId = $queryCGI->param('folder_id');
 my $hostId = $queryCGI->param('host_id');
+my $queryStatus = $queryCGI->param('status');
 my $editMode = $queryCGI->cookie('EDIT_MODE');
 my $hash;
 my $cookie;
@@ -58,6 +58,10 @@ my %hostStatus = ( "total"    => $db->countHostStatus(),
                    "unknown"  => $db->countHostStatus(STATUS_UNKNOWN),
                    "disabled" => $db->countHostStatus(STATUS_DISABLED),
                  );
+# Validate params
+$folderId =~ /^\d+?$/ or $folderId = 0;
+$hostId =~ /^\d+?$/ or $hostId = 0;
+( ($queryStatus>0) && ($queryStatus<4) ) or $queryStatus = 0;
 
 switch ($action)
 {
@@ -81,26 +85,10 @@ switch ($action)
             $title = $title . " :: Configuration mode";
         }
     }
-    case "edit_folder"
-    {
-        $editMode = 1;
-        $title = $title . " :: Edit folder";
-    }
-    case "edit_host"
-    {
-        $editMode = 1;
-        $title = $title . " :: Edit host";
-    }
-    case "show_host"
-    {
-        $editMode = 0;
-        $title = $title . " :: Host details";
-    }
-    case "show_logs"
-    {
-        $editMode = 0;
-        $title = $title . " :: Quick logs";
-    }
+    case "edit_folder" { $title = $title . " :: Edit folder"; }
+    case "edit_host"   { $title = $title . " :: Edit host"; }
+    case "show_host"   { $title = $title . " :: Host details"; }
+    case "show_logs"   { $title = $title . " :: Quick logs"; }
     else
     {
         # Draw main form
@@ -116,13 +104,15 @@ switch ($action)
     }
 }
 
-# Validate params
-$folderId =~ /^\d+?$/ or $folderId = 0;
-$hostId =~ /^\d+?$/ or $hostId = 0;
+switch ($queryStatus)
+{
+    case STATUS_ALIVE   { $title .= " :: Alive"; }
+    case STATUS_DOWN    { $title .= " :: Down"; }
+    case STATUS_UNKNOWN { $title .= " :: Unknown"; }
+}
 
 # Draw header
 $ui->addHeader($title, $refresh, $cookie, %hostStatus);
-
 # Draw folders
 $ui->openFolders($editMode);
 drawFolderField($db, $ui, -1, 0, $folderId, $editMode);
@@ -158,7 +148,7 @@ switch ($action)
         $hash = $db->getHostLogs();
         while ( @row = $hash->fetchrow_array() )
         {
-            $ui->addLog("Host ".$db->getHostNameById($row[3])."$row[0] become ".$statusName{$row[1]}." at $row[2]", $row[1]);
+            $ui->addLog("Host ".$db->getHostNameById($row[3])." become ".$statusName{$row[1]}." at $row[2]", $row[1]);
         }
         $ui->closeLogs();
     }
@@ -167,7 +157,7 @@ switch ($action)
     {
         # Draw hosts
         $ui->openHosts($editMode);
-        drawHostField($db, $ui, $folderId, $config->val('Web', 'sub_folders'), $editMode);
+        drawHostField($db, $ui, $folderId, $config->val('Web', 'sub_folders'), $editMode, $queryStatus);
         $ui->closeHosts();
     }
 }
@@ -182,6 +172,5 @@ $ui->addFooter($message);
 
 # Close database
 $db->DESTROY;
-
 # End of main function
 1;

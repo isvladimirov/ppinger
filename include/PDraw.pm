@@ -62,6 +62,7 @@ package PDraw
         print "<meta charset='UTF-8'>\n";
         print "<title>$title</title>\n";
         print "<link href='share/style.css' rel='stylesheet'>\n";
+        print "<link rel='shortcut icon' href='/share/home.svg' type='image/svg'>";
         if ($refresh) { print "<meta http-equiv='refresh' content=$refresh>\n"; }
         print "</head>\n";
         print "<body>\n";
@@ -76,12 +77,13 @@ package PDraw
 
         print "<div id='pageHeaderStatus'>\n";
         print "Total hosts: $hostStatus{'total'}<br>\n";
-        print "<font color='green'>Alive: $hostStatus{'alive'}</font><br>\n";
-        print "<font color='red'>Down: $hostStatus{'down'}</font><br>\n";
-        print "<font color='orange'>Unknown: $hostStatus{'unknown'}</font><br>\n";
+        print "<a href='./index.pl?status=2'><font color='green'>Alive: $hostStatus{'alive'}</font></a><br>\n";
+        print "<a href='./index.pl?status=1'><font color='red'>Down: $hostStatus{'down'}</font></a><br>\n";
+        print "<a href='./index.pl?status=3'><font color='orange'>Unknown: $hostStatus{'unknown'}</font></a><br>\n";
         print "</div>\n";
 
         print "<div id='pageHeaderRight'>\n";
+        print "<a href='./index.pl'><img width='32' src='share/home.svg' alt='Show start page'></a>\n";
         print "<a href='./index.pl?action=show_logs'><img width='32' src='share/logs.svg' alt='Show quick logs'></a>\n";
         print "<a href='./index.pl?action=edit'><img width='32' src='share/configure.svg' alt='Enter edit mode'></a>\n";
         print "</div>\n";
