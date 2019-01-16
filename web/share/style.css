@@ -37,7 +37,7 @@ li {
 }
 #pageHeaderRight {
     float: right;
-    padding: 0;
+    padding: 10px;
 }
 #pageFooter {
     grid-area: footer;
@@ -232,4 +232,21 @@ li#statusDisabled {
     margin-right: 0;
     margin-top: 1px;
     background-color: #999999;
+}
+#hint {
+    display: inline-block;
+    position: relative;
+}
+#hint:hover::after {
+    content:  attr(data-title);
+    position: absolute;
+    left: 0%; top: 100%;
+    z-index: 1;
+    background: #bbbbbb;
+    font-family: Arial, sans-serif;
+    font-size: 11px;
+    text-align: center;
+    padding: 5px 10px;
+    border: 1px solid #333;
+    color: #000000;
 }
