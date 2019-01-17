@@ -9,7 +9,6 @@
 
 use CGI::Carp qw(warningsToBrowser fatalsToBrowser);
 use lib "../include";
-use PDraw;
 use PMySQL;
 use CGI qw(:standard);
 use Config::IniFiles;
