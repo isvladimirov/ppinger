@@ -65,7 +65,7 @@ package PDraw
         print "<link rel='shortcut icon' href='/share/home.svg' type='image/svg'>";
         if ($refresh) { print "<meta http-equiv='refresh' content=$refresh>\n"; }
         print "</head>\n";
-        print "<body>\n";
+        print "<body id='main'>\n";
         print "<header id='pageHeader'>\n";
 
         print "<div id='pageHeaderLeft'>\n";
@@ -432,6 +432,35 @@ package PDraw
         print "</ul>\n</div>\n";
         print "</div>\n";
         print "</article>\n";
+        return 1;
+    }
+
+    # Shows login page
+    sub showLoginPage
+    {
+        my($self, $title, $message) = @_;
+        my $queryCGI = CGI->new();
+        print $queryCGI->header(-type=>"text/html;charset=UTF-8");
+        print "<!DOCTYPE html>\n";
+        print "<html>\n";
+        print "<head>\n";
+        print "<meta charset='UTF-8'>\n";
+        print "<title>$title</title>\n";
+        print "<link href='share/style.css' rel='stylesheet'>\n";
+        print "<link rel='shortcut icon' href='/share/home.svg' type='image/svg'>";
+        print "</head>\n";
+        print "<body id='login'>\n";
+        print "<form action='./auth.pl' method='post'>\n";
+        print "<table id='login'>\n";
+        print "<tr><th colspan='2'>$title</th></tr>\n";
+        print "<tr><td>Login:</td><td><input type='text' name='login'></td></tr>";
+        print "<tr><td>Password:</td><td><input type='password' name='password'></td></tr>";
+        print "<tr><td colspan='2' align='right'><input type='submit' value='Login'></td></tr>\n";
+        print "<tr><td colspan='2' id='login'>$message</td></tr>\n";
+        print "</table>\n";
+        print "</form>\n";
+        print "</body>\n";
+        print "</html>\n";
         return 1;
     }
 }
