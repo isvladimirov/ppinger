@@ -14,6 +14,7 @@ use PDraw;
 use PMySQL;
 use utf8;
 use CGI qw(-utf8);
+use CGI::Session qw(-ip-match);
 use Config::IniFiles;
 use Switch;
 use strict;
@@ -27,13 +28,29 @@ use constant
     STATUS_DISABLED => 4,
 };
 
-my %statusName = ( 1 => "down",
-                   2 => "alive",
-                   3 => "unknown",
-                   4 => "disabled",
-                 );
-my $config = Config::IniFiles->new( -file => "../etc/ppinger.cfg" );
 my $queryCGI = CGI->new();
+### Authorization ###
+my $session;
+if ( $queryCGI->cookie('SESSION_ID') )
+{
+    $session = new CGI::Session("driver:File", $queryCGI->cookie('SESSION_ID'), {Directory=>"/tmp"});
+    if ( $session->id() ne $queryCGI->cookie('SESSION_ID') )
+    {
+        ### Authorization failed ###
+        $session->delete();
+        print $queryCGI->redirect("auth.pl");
+        return 1;
+    }
+}
+else
+{
+    # Authorization failed
+    print $queryCGI->redirect("auth.pl");
+    return 1;
+}
+### Authorization verified ###
+$session->expire('+1h');
+my $config = Config::IniFiles->new( -file => "../etc/ppinger.cfg" );
 # Try to open database
 my $db = PMySQL->new(
     $config->val('SQL', 'db_host'),
@@ -52,18 +69,17 @@ my $queryStatus = $queryCGI->param('status');
 my $editMode = $queryCGI->cookie('EDIT_MODE');
 my $hash;
 my $cookie;
-my $sessionID = $queryCGI->cookie('SESSION_ID');
 my %hostStatus = ( "total"    => $db->countHostStatus(),
                    "down"     => $db->countHostStatus(STATUS_DOWN),
                    "alive"    => $db->countHostStatus(STATUS_ALIVE),
                    "unknown"  => $db->countHostStatus(STATUS_UNKNOWN),
                    "disabled" => $db->countHostStatus(STATUS_DISABLED),
                  );
-
-# TODO
-# Here will be a block for comparing cookie's and DB's session IDs
-# If they are not equal go to auth.pl?action=login
-
+my %statusName = ( 1 => "down",
+                   2 => "alive",
+                   3 => "unknown",
+                   4 => "disabled",
+                 );
 # Validate params
 $folderId =~ /^\d+?$/ or $folderId = 0;
 $hostId =~ /^\d+?$/ or $hostId = 0;

@@ -11,12 +11,34 @@ use CGI::Carp qw(warningsToBrowser fatalsToBrowser);
 use lib "../include";
 use PMySQL;
 use CGI qw(:standard);
+use CGI::Session qw(-ip-match);
 use Config::IniFiles;
 use Switch;
 use strict;
 
-my $config = Config::IniFiles->new( -file => "../etc/ppinger.cfg" );
 my $queryCGI = CGI->new();
+### Authorization ###
+my $session;
+if ( $queryCGI->cookie('SESSION_ID') )
+{
+    $session = new CGI::Session("driver:File", $queryCGI->cookie('SESSION_ID'), {Directory=>"/tmp"});
+    if ( $session->id() ne $queryCGI->cookie('SESSION_ID') )
+    {
+        ### Authorization failed ###
+        $session->delete();
+        print $queryCGI->redirect("auth.pl");
+        return 1;
+    }
+}
+else
+{
+    # Authorization failed
+    print $queryCGI->redirect("auth.pl");
+    return 1;
+}
+### Authorization verified ###
+$session->expire('+1h');
+my $config = Config::IniFiles->new( -file => "../etc/ppinger.cfg" );
 # Try to open database
 my $db = PMySQL->new(
     $config->val('SQL', 'db_host'),

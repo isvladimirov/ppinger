@@ -438,9 +438,16 @@ package PDraw
     # Shows login page
     sub showLoginPage
     {
-        my($self, $title, $message) = @_;
+        my($self, $title, $message, $cookie) = @_;
         my $queryCGI = CGI->new();
-        print $queryCGI->header(-type=>"text/html;charset=UTF-8");
+        if ($cookie)
+        {
+            print $queryCGI->header(-type=>"text/html;charset=UTF-8",-cookie=>$cookie);
+        }
+        else
+        {
+            print $queryCGI->header(-type=>"text/html;charset=UTF-8");
+        }
         print "<!DOCTYPE html>\n";
         print "<html>\n";
         print "<head>\n";
@@ -456,7 +463,7 @@ package PDraw
         print "<tr><td>Login:</td><td><input type='text' name='login'></td></tr>";
         print "<tr><td>Password:</td><td><input type='password' name='password'></td></tr>";
         print "<tr><td colspan='2' align='right'><input type='submit' value='Login'></td></tr>\n";
-        print "<tr><td colspan='2' id='login'>$message</td></tr>\n";
+        if ($message) { print "<tr><td colspan='2' id='login'>$message</td></tr>\n"; }
         print "</table>\n";
         print "</form>\n";
         print "</body>\n";

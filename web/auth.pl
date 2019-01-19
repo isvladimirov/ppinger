@@ -13,9 +13,8 @@ use PDraw;
 use PMySQL;
 use utf8;
 use CGI qw(-utf8);
-use CGI qw(:standard);
+use CGI::Session qw(-ip-match);
 use Config::IniFiles;
-use Digest::MD5 qw(md5 md5_hex md5_base64);
 use Switch;
 use strict;
 
@@ -29,33 +28,34 @@ my $db = PMySQL->new(
     $config->val('SQL', 'db_pass'),
     $config->val('SQL', 'db_name')
 );
-# Clean up old session IDs
-# Not implemented yet
+my $session;
+my $cookie;
 
 # Getting input params
 my $title = $config->val('Web', 'title');
-my $sessionID = $queryCGI->cookie('SESSION_ID');
 my $login = $queryCGI->param('login');
 my $pass = $queryCGI->param('password');
 my $action = $queryCGI->param('action');
 # Check what action we need to handle
 switch ($action)
 {
-    case "login"
-    {
-        # Just draw login page here
-        $ui->showLoginPage($title);
-    }
-    case "fail"
-    {
-        # Same as "login", but print fail message
-        $ui->showLoginPage($title, "Login failed");
-    }
     case "logout"
     {
-        # Same as "login", but remove session id from database and user side
-        # TODO: remove session ID
-        $ui->showLoginPage($title);
+        # Remove session id and draw login page
+        if ( $queryCGI->cookie('SESSION_ID') )
+        {
+            $session = new CGI::Session("driver:File", $queryCGI->cookie('SESSION_ID'), {Directory=>"/tmp"});
+            if ($session) { $session->delete(); }
+            $cookie = $queryCGI->cookie(
+                        -name => "SESSION_ID",
+                        -value => $queryCGI->cookie('SESSION_ID'),
+                        -expires => "-1d" );
+            $ui->showLoginPage($title, undef, $cookie);
+        }
+        else
+        {
+            $ui->showLoginPage($title);
+        }
     }
     else
     {
@@ -66,19 +66,38 @@ switch ($action)
             #$pass = md5($pass);
             if ( ($config->val('Web', 'username') eq $login)&&($config->val('Web', 'password') eq $pass) )
             {
-                # TODO: write session ID
-                print $queryCGI->redirect("./index.pl");
+                # Generate and write new session id
+                $session = new CGI::Session("driver:File", undef, {Directory=>"/tmp"});
+                $session->expire('+1h');
+                $cookie = $queryCGI->cookie( SESSION_ID => $session->id() );
+                print $queryCGI->redirect( -uri => "./index.pl", -cookie => $cookie );
             }
             else
             {
-                print $queryCGI->redirect("./auth.pl?action=fail");
+                # Login or pass are wrong
+                $ui->showLoginPage($title, "Login failed");
             }
         }
         else
         {
-            # Check for session id, compare it with database,
-            # send to index.pl or auth.pl?action=login
-            print $queryCGI->redirect("./auth.pl?action=login");
+            # Compare server and user side session IDs
+            if ( $queryCGI->cookie('SESSION_ID') )
+            {
+                $session = new CGI::Session("driver:File", $queryCGI->cookie('SESSION_ID'), {Directory=>"/tmp"});
+                if ( $session->id() eq $queryCGI->cookie('SESSION_ID') )
+                {
+                    print $queryCGI->redirect("index.pl");
+                }
+                else
+                {
+                    $session->delete();
+                    $ui->showLoginPage($title);
+                }
+            }
+            else
+            {
+                $ui->showLoginPage($title);
+            }
         }
     }
 }
