@@ -86,6 +86,7 @@ package PDraw
         print "<a href='./index.pl' id='hint' data-title='Show main page'><img width='32' src='share/home.svg' alt='Show main page'></a>\n";
         print "<a href='./index.pl?action=show_logs' id='hint' data-title='Show quick logs'><img width='32' src='share/logs.svg' alt='Show quick logs'></a>\n";
         print "<a href='./index.pl?action=edit' id='hint' data-title='Edit mode'><img width='32' src='share/configure.svg' alt='Toggle edit mode'></a>\n";
+        print "<a href='./auth.pl?action=logout' id='hint' data-title='Log out'><img width='32' src='share/logout.svg' alt='Logout'></a>\n";
         print "</div>\n";
 
         print "</header>\n";
