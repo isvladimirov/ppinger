@@ -1,0 +1,19 @@
+#!/bin/sh
+
+DIR=/mnt/zstorage/develop/ppinger/
+
+case "$1" in
+start)
+        cd $DIR/bin/
+        daemon -f -p /var/run/ppoller.pid ./ppoller.pl
+        ;;
+stop)
+        kill -9 `cat /var/run/ppoller.pid`
+        ;;
+*)
+        echo "Usage: `basename $0` {start|stop}" >&2
+        exit 64
+        ;;
+esac
+
+exit 0
