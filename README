@@ -43,3 +43,8 @@ cp sbin/ppoller-linux /etc/init.d/ppoller
 cp sbin/ppoller-freebsd /usr/local/
 
 6. Set installation path of the PPinger in /etc/init.d/ppoller or /etc/rc.conf (ppoller_dir=<installation path>)
+
+USAGE
+=====
+
+Go to the web page accordingly your web server settings. You must see a login page. Default login is ppinger. Password you can find in etc/ppinger.cfg. It is strongly recommended to change it before first usage.
