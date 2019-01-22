@@ -7,7 +7,7 @@
 # Copyright 2018-2019 duk3L3t0
 #######################################
 
-#use CGI::Carp qw(warningsToBrowser fatalsToBrowser);
+use CGI::Carp qw(warningsToBrowser fatalsToBrowser);
 use lib "../include";
 require "PCore.pl";
 use PDraw;
