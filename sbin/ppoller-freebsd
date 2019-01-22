@@ -1,20 +1,19 @@
 #!/bin/sh
 
-# PROVIDE: ppoller
-# REQUIRE: DAEMON
-# KEYWORD: shutdown
+DIR=/usr/local/ppinger/
 
-. /etc/rc.subr
+case "$1" in
+start)
+        cd $DIR/sbin/
+        daemon -f -p /var/run/ppoller.pid ./ppoller.pl
+        ;;
+stop)
+        kill -9 `cat /var/run/ppoller.pid`
+        ;;
+*)
+        echo "Usage: `basename $0` {start|stop}" >&2
+        exit 64
+        ;;
+esac
 
-ppoller_enable=${ppoller_enable:-"NO"}
-ppoller_dir=${ppoller_dir:-"/usr/local/ppoller"}
-
-name="ppoller"
-rcvar=`set_rcvar`
-load_rc_config $name
-command="/usr/sbin/daemon"
-command_args="-f -p /var/run/ppoller.pid ./ppoller.pl"
-
-stop_cmd="kill -9 `cat /var/run/ppoller.pid`"
-
-run_rc_command "$1"
+exit 0

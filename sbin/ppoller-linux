@@ -16,7 +16,7 @@ DIR=/opt/ppinger/
 case "$1" in
   start)
     echo "Starting ppoller..."
-    cd $DIR/bin/ && daemonize -l /var/run/ppoller.lock -p /var/run/ppoller.pid ./ppoller.pl
+    cd $DIR/sbin/ && daemonize -l /var/run/ppoller.lock -p /var/run/ppoller.pid ./ppoller.pl
     ;;
   stop)
     echo "Stopping ppoller..."
