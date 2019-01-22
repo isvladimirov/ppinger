@@ -18,17 +18,20 @@ REQUIREMENTS
 1. Web server
 2. MySQL server
 3. Perl5
+3.1. p5-DBI
+3.2. p5-DBD-mysql
+3.3. p5-CGI-Session
+3.4. p5-Config-IniFiles
+3.5. p5-Switch
+3.6. p5-Net-Ping-External
 
 INSTALL
 =======
 
 1. Setup your web server
-1.1. Set ppinger/web as a document root.
-1.2. Make *.pl files executable via mod_perl or cgi-bin.
-1.3. Install modules that allow to work with MySQL.
-2. Setup MySQL server and create a database (use sql/ppinger.sql to fill it).
+1.1. Set ppinger/web as a document root
+1.2. Make *.pl files executable via mod_perl or cgi-bin
+2. Setup MySQL server and create a database (use sql/ppinger.sql to fill it)
 3. Setup params in etc/ppinger.cfg
 4. Set installation path to the startup script ppinger/bin/poller.sh
-5. Add this script to /etc/crontab:
-
-* * * * * root /path_to_app/ppinger/bin/poller.sh > /dev/null
+5. Use startup scripts from sbin/ directory depending on your os type

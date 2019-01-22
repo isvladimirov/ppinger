@@ -1,0 +1,20 @@
+#!/bin/sh
+
+# PROVIDE: ppoller
+# REQUIRE: DAEMON
+# KEYWORD: shutdown
+
+. /etc/rc.subr
+
+ppoller_enable=${ppoller_enable:-"NO"}
+ppoller_dir=${ppoller_dir:-"/usr/local/ppoller"}
+
+name="ppoller"
+rcvar=`set_rcvar`
+load_rc_config $name
+command="/usr/sbin/daemon"
+command_args="-f -p /var/run/ppoller.pid ./ppoller.pl"
+
+stop_cmd="kill -9 `cat /var/run/ppoller.pid`"
+
+run_rc_command "$1"

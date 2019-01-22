@@ -16,7 +16,7 @@ use Data::Validate::Domain qw(is_domain);
 use strict;
 use constant
 {
-    DEBUG => 1, # '0' - Debug is OFF, '1' - Debug is ON
+    DEBUG => 0, # '0' - Debug is OFF, '1' - Debug is ON
     STATUS_ALL => 0,
     STATUS_DOWN => 1,
     STATUS_ALIVE => 2,

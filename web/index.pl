@@ -7,7 +7,7 @@
 # Copyright 2018-2019 duk3L3t0
 #######################################
 
-use CGI::Carp qw(warningsToBrowser fatalsToBrowser);
+#use CGI::Carp qw(warningsToBrowser fatalsToBrowser);
 use lib "../include";
 require "PCore.pl";
 use PDraw;
@@ -20,7 +20,7 @@ use Switch;
 use strict;
 use constant
 {
-    APP_VERSION => "0.9 (developing)",
+    APP_VERSION => "1.0 (preview)",
     STATUS_ALL => 0,
     STATUS_DOWN => 1,
     STATUS_ALIVE => 2,
