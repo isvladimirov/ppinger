@@ -1,6 +1,6 @@
 -- MySQL dump 10.13  Distrib 5.6.43, for FreeBSD12.0 (amd64)
 --
--- Host: localhost    Database: qpinger
+-- Host: localhost    Database: ppinger
 -- ------------------------------------------------------
 -- Server version	5.6.43-log
 
@@ -25,7 +25,7 @@ DROP TABLE IF EXISTS `folders`;
 CREATE TABLE `folders` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `parent_id` int(10) NOT NULL,
+  `parent_id` int(10) NOT NULL DEFAULT '-1',
   PRIMARY KEY (`id`),
   UNIQUE KEY `id_UNIQUE` (`id`),
   UNIQUE KEY `name_UNIQUE` (`name`)
@@ -51,21 +51,21 @@ DROP TABLE IF EXISTS `hosts`;
 CREATE TABLE `hosts` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `host` varchar(508) COLLATE utf8_unicode_ci NOT NULL,
-  `parent_id` int(10) NOT NULL,
-  `status` int(10) unsigned NOT NULL,
+  `parent_id` int(10) NOT NULL DEFAULT '-1',
+  `status` int(10) unsigned NOT NULL DEFAULT '3',
   `reply` int(10) unsigned DEFAULT NULL,
-  `method` varchar(80) COLLATE utf8_unicode_ci NOT NULL,
-  `port` int(10) unsigned NOT NULL,
-  `attempts` int(10) unsigned NOT NULL,
-  `timeout` int(10) unsigned NOT NULL,
-  `last_test_time` datetime NOT NULL,
-  `last_status` int(10) unsigned NOT NULL,
-  `status_changed` datetime NOT NULL,
+  `method` varchar(80) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'ping',
+  `port` int(10) unsigned NOT NULL DEFAULT '1',
+  `attempts` int(10) unsigned NOT NULL DEFAULT '2',
+  `timeout` int(10) unsigned NOT NULL DEFAULT '200',
+  `last_test_time` datetime DEFAULT '0000-00-00 00:00:00',
+  `last_status` int(10) unsigned NOT NULL DEFAULT '3',
+  `status_changed` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `comment` varchar(508) COLLATE utf8_unicode_ci DEFAULT NULL,
   `command` varchar(1020) COLLATE utf8_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `id_UNIQUE` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -88,10 +88,10 @@ CREATE TABLE `logs` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `host_id` int(11) unsigned NOT NULL,
   `status` int(11) NOT NULL,
-  `time` datetime NOT NULL,
+  `time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `id_UNIQUE` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -112,4 +112,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2019-01-22 22:14:43
+-- Dump completed on 2019-01-22 23:07:21
