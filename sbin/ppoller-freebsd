@@ -5,7 +5,7 @@ DIR=/usr/local/ppinger/
 case "$1" in
 start)
         cd $DIR/sbin/
-        daemon -f -p /var/run/ppoller.pid ./ppoller.pl
+        nohup ./ppoller.pl > /dev/null 2>&1 & echo $! > /var/run/ppoller.pid
         ;;
 stop)
         kill -9 `cat /var/run/ppoller.pid`
