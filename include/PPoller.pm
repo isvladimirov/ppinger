@@ -72,6 +72,7 @@ package PPoller
                 for ($i = 0; $i<$host{"attempts"}; $i++)
                 {
                     ($avail, $dur) = $p->ping($host{"host"}, $host{"timeout"}/1000);
+                    print $host{"host"}." ";
                     if ($avail)
                     {
                         $status = 1;
@@ -79,7 +80,6 @@ package PPoller
                     }
                 }
                 $p->close;
-                $dur *= 1000; # Convert seconds to milliseconds
             }
             case "external"
             {

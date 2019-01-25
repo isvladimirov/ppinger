@@ -325,7 +325,7 @@ package PMySQL
             $query .= "status_changed=now(), ";
             $query .= "status=$status, ";
         }
-        if ($reply =~ /^\d+?$/) {$query .= "reply=$reply, ";}
+        if ($reply) {$query .= "reply=$reply, ";}
         $query .= "last_test_time=now() ";
         $query .= "WHERE id=$id;";
         return $dbh->do($query);

@@ -347,14 +347,14 @@ package PDraw
         {
             print "<option value='tcp'>TCP</option>\n";
         }
-        if ($host{"method"} eq "udp")
-        {
-            print "<option selected value='udp'>UDP</option>\n";
-        }
-        else
-        {
-            print "<option value='udp'>UDP</option>\n";
-        }
+#         if ($host{"method"} eq "udp")
+#         {
+#             print "<option selected value='udp'>UDP</option>\n";
+#         }
+#         else
+#         {
+#             print "<option value='udp'>UDP</option>\n";
+#         }
         if ($host{"method"} eq "external")
         {
             print "<option selected value='external'>External</option>\n";

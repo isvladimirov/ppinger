@@ -31,6 +31,7 @@ my $status;
 my @row;
 my %host;
 my $reply;
+my $sth;
 
 print "Loading settings...\n" if DEBUG;
 my $config = Config::IniFiles->new( -file => "../etc/ppinger.cfg" );
@@ -49,7 +50,7 @@ while ($continue)
 {
     foreach $status (@order)
     {
-        my $sth = $db->getHostList(0, $status);
+        $sth = $db->getHostList();
         while (@row = $sth->fetchrow_array())
         {
             $host{"host"} = $row[1];
