@@ -38,11 +38,11 @@ INSTALL
 4. Setup params in etc/ppinger.cfg
 5. Copy a startup script
 
-cp sbin/ppoller-linux /etc/init.d/ppoller
+5.1 cp sbin/ppoller-linux /etc/init.d/ppoller
 
 -- or --
 
-cp sbin/ppoller-freebsd /usr/local/
+5.2 cp sbin/ppoller-freebsd /usr/local/etc/rc.d/ppoller
 
 6. Set installation path of the PPinger in /etc/init.d/ppoller or /usr/local/etc/rc.d/ppoller
 
