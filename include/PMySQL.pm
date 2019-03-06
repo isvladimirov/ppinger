@@ -167,7 +167,7 @@ package PMySQL
     sub getFolderIdByName
     {
         my($self, $name) = @_;
-        my $queryHash = $dbh->prepare("SELECT id FROM folders WHERE name=$name;");
+        my $queryHash = $dbh->prepare("SELECT id FROM folders WHERE name='$name';");
         $queryHash->execute;
         my @row = $queryHash->fetchrow_array();
         $queryHash->finish();
