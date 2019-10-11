@@ -87,26 +87,26 @@ $hostId =~ /^\d+?$/ or $hostId = 0;
 
 switch ($action)
 {
-    case "edit"
-    {
-        # Toggle edit mode
-        if ($editMode)
-        {
-            # Edit mode is on. Turn it off.
-            $cookie = new CGI::Cookie(-name=>'EDIT_MODE',-value=>'0');
-            $editMode = 0;
-            $action = "view";
-            $refresh = $config->val('Web', 'refresh');
-            $title .= " :: View mode";
-        }
-        else
-        {
-            # Edit mode is off. Turn it on.
-            $cookie = new CGI::Cookie(-name=>'EDIT_MODE',-value=>'1');
-            $editMode = 1;
-            $title = $title . " :: Configuration mode";
-        }
-    }
+#    case "edit"
+#    {
+#        # Toggle edit mode
+#        if ($editMode)
+#        {
+#            # Edit mode is on. Turn it off.
+#            $cookie = new CGI::Cookie(-name=>'EDIT_MODE',-value=>'0');
+#            $editMode = 0;
+#            $action = "view";
+#            $refresh = $config->val('Web', 'refresh');
+#            $title .= " :: View mode";
+#        }
+#        else
+#        {
+#            # Edit mode is off. Turn it on.
+#            $cookie = new CGI::Cookie(-name=>'EDIT_MODE',-value=>'1');
+#            $editMode = 1;
+#            $title = $title . " :: Configuration mode";
+#        }
+#    }
     case "edit_folder" { $title = $title . " :: Edit folder"; }
     case "edit_host"   { $title = $title . " :: Edit host"; }
     case "show_host"   { $title = $title . " :: Host details"; }
@@ -170,11 +170,11 @@ switch ($action)
         $hash = $db->getHostLogs();
         while ( @row = $hash->fetchrow_array() )
         {
-            $ui->addLog("Host ".$db->getHostNameById($row[3])." become ".$statusName{$row[1]}." at $row[2]", $row[1]);
+            $ui->addLog("Host ".$db->getHostNameById($row[3])." (".$db->getHostCommentById($row[3]).") become ".$statusName{$row[1]}." at $row[2]", $row[1]);
         }
         $ui->closeLogs();
     }
-    
+
     else
     {
         # Draw hosts

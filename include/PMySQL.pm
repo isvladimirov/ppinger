@@ -1,11 +1,24 @@
 #!/usr/bin/env perl
 
-#######################################
-# PPinger
-# PMySQL.pm
-# Class for accessing MySQL database
-# Copyright 2018-2019 duk3L3t0
-#######################################
+#############################################################################
+#
+#    PMySQL.pm - Class for accessing MySQL database
+#    Copyright (C) 2018-2019 Igor Vladimirov <luiseal.mail@gmail.com>
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see http://www.gnu.org/licenses/
+#
+#############################################################################
 # Status values:
 # 0 - show all (when it's posible)
 # 1 - Down
@@ -95,7 +108,7 @@ package PMySQL
         if ( ($where) && ($status) ) { $where = $where . " and"; }
         if ($status) { $where = $where . " status=$status"; }
         if ($where) { $where = "WHERE" . $where; }
-        my $query = "SELECT id,host,parent_id,status,reply,method,port,attempts,timeout,last_test_time,last_status,status_changed,comment,command FROM hosts $where ORDER BY status, host;";
+        my $query = "SELECT id,host,parent_id,status,reply,method,port,attempts,timeout, DATE_FORMAT(last_test_time, '%d.%m.%Y %H:%i:%s') AS last_test_time, last_status, DATE_FORMAT(status_changed, '%d.%m.%Y %H:%i:%s') AS status_changed, comment,command FROM hosts SQL_NO_CACHE $where ORDER BY status, host;";
         my $queryHash = $dbh->prepare($query);
         $self->{ITEMS_COUNT} = $queryHash->execute;
         return $queryHash;
@@ -133,14 +146,14 @@ package PMySQL
         my($self) = @_;
         return $self->{ITEMS_COUNT};
     }
-    
+
     # Returns last error
     sub getLastError
     {
         my($self) = @_;
         return $self->{LAST_ERROR};
     }
-    
+
     # Returns name of a folder with $id.
     sub getFolderNameById
     {
@@ -162,7 +175,7 @@ package PMySQL
         $queryHash->finish();
         return $row[0];
     }
-    
+
     # Returns id of the folder by a given name
     sub getFolderIdByName
     {
@@ -174,14 +187,14 @@ package PMySQL
         $row[0] or $row[0]=0;
         return $row[0];
     }
-    
+
     # Creates folder
     sub createFolder
     {
         my($self, $name, $parent) = @_;
         return $dbh->do("INSERT INTO folders (name, parent_id) VALUES ('$name', $parent);");
     }
-    
+
     # Deletes folder with given ID
     sub deleteFolder
     {
@@ -212,7 +225,7 @@ package PMySQL
         if ($id eq $parentId) {$self->{LAST_ERROR}="Cannot move folder to itself!"; return 0;}
         return $dbh->do("UPDATE folders SET name='$name', parent_id=$parentId WHERE id=$id;");
     }
-    
+
     # Returns name of a host with $id.
     sub getHostNameById
     {
@@ -234,7 +247,7 @@ package PMySQL
         $queryHash->finish();
         return $row[0];
     }
-    
+
     # Returns id of the host by a given name
     sub getHostIdByName
     {
@@ -246,8 +259,8 @@ package PMySQL
         $row[0] or $row[0]=0;
         return $row[0];
     }
-    
-    # Returns id of the host by a given name
+
+    # Returns id of the host by a given comment name
     sub getHostCommentById
     {
         my($self, $id) = @_;
@@ -258,7 +271,7 @@ package PMySQL
         $row[0] or $row[0]=0;
         return $row[0];
     }
-    
+
     # Creates a host
     sub createHost
     {
@@ -275,7 +288,7 @@ package PMySQL
         $query .= $host{"port"}.", ".$host{"attempts"}.", ".$host{"timeout"}.", '".$host{"comment"}."');";
         return $dbh->do($query);
     }
-    
+
     # Deletes a host
     sub deleteHost
     {
@@ -335,7 +348,7 @@ package PMySQL
     sub getHostLogs
     {
         my($self, $id) = @_;
-        my $query = "SELECT id,status,time,host_id FROM logs ORDER BY time DESC LIMIT 100;";
+        my $query = "SELECT id,status,time,host_id FROM logs ORDER BY time DESC LIMIT 1000;";
         if ($id) { $query = "SELECT id,status,time FROM logs WHERE host_id=$id ORDER BY time DESC;"; }
         my $queryHash = $dbh->prepare($query);
         $self->{ITEMS_COUNT} = $queryHash->execute;
@@ -365,17 +378,31 @@ package PMySQL
         return $dbh->do("DELETE FROM logs WHERE id=$id;");
     }
 
-    # Returns count of host with given status in a folder ('0' means all folders)
+    # Returns count of host with given status ($status="0" means all hosts) in a folder ($parent="0" means all folders)
     sub countHostStatus
     {
         my($self, $status, $parent) = @_;
         my $query="SELECT count(*) FROM hosts;";
         if ( $status ) { $query = "SELECT count(*) FROM hosts WHERE status=$status;"; }
+        if ( $parent ) { $query = "SELECT count(*) FROM hosts WHERE parent_id=$parent;"; }
         if ( $status && $parent ) { $query = "SELECT count(*) FROM hosts WHERE status=$status AND parent_id=$parent;"; }
         my $queryHash = $dbh->prepare($query);
         $queryHash->execute();
         my @row = $queryHash->fetchrow_array();
         return $row[0];
     }
+
+    # Returns path of a given folder
+    sub getPath
+    {
+        my($self, $folderId, $suffix) = @_;
+        if ( $folderId > 0 ) { $self->getPath($self->getFolderParentById($folderId), "/".$self->getFolderNameById($folderId).$suffix); }
+        else
+        {
+            if (!$suffix) { $suffix = "/"; }
+            return $suffix;
+        }
+    }
+
 }
 1;

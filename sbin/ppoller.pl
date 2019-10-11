@@ -7,7 +7,7 @@
 # Copyright 2018-2019 duk3L3t0
 #######################################
 
-use lib "../include";
+use lib "/opt/ppinger/include";
 use PMySQL;
 use PPoller;
 use Config::IniFiles;
@@ -32,10 +32,13 @@ my @row;
 my %host;
 my $reply;
 my $sth;
+my $i;
+my $triggerRised = 0;
+my $message;
+my $hostsDown;
 
 print "Loading settings...\n" if DEBUG;
-my $config = Config::IniFiles->new( -file => "../etc/ppinger.cfg" );
-
+my $config = Config::IniFiles->new( -file => "/opt/ppinger/etc/ppinger.cfg" );
 print "Try to open database...\n" if DEBUG;
 my $db = PMySQL->new(
     $config->val('SQL', 'db_host'),
@@ -44,21 +47,30 @@ my $db = PMySQL->new(
     $config->val('SQL', 'db_name')
 );
 
+my $tgToken = $config->val('Poller', 'tg_token');
+
 print "Checking hosts...\n" if DEBUG;
 my $poller = PPoller->new();
+
 while ($continue)
 {
-    foreach $status (@order)
+    for ($i=0; $i<scalar @order; $i++)
     {
-        $sth = $db->getHostList();
+        $status = $order[$i];
+        print "Getting host list with status $status..." if DEBUG;
+        $sth = $db->getHostList(0, $status);
+        print " OK\n" if DEBUG;
         while (@row = $sth->fetchrow_array())
         {
+            print "Getting host information..." if DEBUG;
+            $host{"id"} = $row[0];
             $host{"host"} = $row[1];
             $host{"method"} = $row[5];
             $host{"port"} = $row[6];
             $host{"attempts"} = $row[7];
             $host{"timeout"} = $row[8];
             $host{"command"} = $row[13];
+            print " OK\n" if DEBUG;
             print "Checking ".$host{"host"}." with ".$host{"method"}."... " if DEBUG;
             if ( (is_ip($host{"host"})) || (is_domain($host{"host"})) )
             {
@@ -79,12 +91,38 @@ while ($continue)
                 $status = STATUS_DISABLED;
                 print "[wrong address] This host will be disabled.\n" if DEBUG;
             }
-            $db->updateHostStatus($row[0], $status, $reply, $config->val('Poller', 'max_log_count'));
+            print "Updating host..." if DEBUG;
+            $db->updateHostStatus($host{"id"}, $status, $reply, $config->val('Poller', 'max_log_count'));
+            print " OK\n" if DEBUG;
         }
         $sth->finish();
     }
+# Trigger
+    $hostsDown = $db->countHostStatus(STATUS_DOWN);
+    if ( $hostsDown>=$config->val('Poller', 'trigger_count') )
+    {
+        if ( !($triggerRised) )
+        {
+            print "Trigger rised. Sending message...\n" if DEBUG;
+            $message = "DTL_PPinger. Внимание! Количество упавших узлов превысило пороговое значение (".$config->val('Poller', 'trigger_count').") и составляет $hostsDown.";
+            `wget -O /dev/null \"http://crierbot.appspot.com/$tgToken/send?message=$message\" > /dev/null`;
+            $triggerRised = 1;
+        }
+    }
+    else
+    {
+        if ( $triggerRised )
+        {
+            print "Trigger down. Sending message...\n" if DEBUG;
+            $message = "DTL_PPinger. Количество упавших узлов пришло в норму (".$config->val('Poller', 'trigger_count').") и составляет $hostsDown.";
+            `wget -O /dev/null \"http://crierbot.appspot.com/$tgToken/send?message=$message\" > /dev/null`;
+            $triggerRised = 0;
+        }
+    }
+# Delay before next check iteration
     sleep ($config->val('Poller', 'interval'));
 }
+
 print "Closing database...\n" if DEBUG;
 $db->DESTROY();
 

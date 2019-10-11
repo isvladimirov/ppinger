@@ -1,11 +1,24 @@
 #!/usr/bin/env perl
 
-#######################################
-# PPinger
-# PCore.pl
-# Web core library
-# Copyright 2018-2019 duk3L3t0
-#######################################
+#############################################################################
+#
+#    PCore.pl - Web core library
+#    Copyright (C) 2018-2019 Igor Vladimirov <luiseal.mail@gmail.com>
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see http://www.gnu.org/licenses/
+#
+#############################################################################
 
 use Switch;
 use strict;
@@ -62,15 +75,28 @@ sub drawFolderField
 sub drawHostField
 {
     my ($sourceDB, $destinationUI, $parent, $isRecursive, $editMode, $showStatus) = @_;
-    if ($showStatus) { $isRecursive = 0; } # Cannot use Recursive Mode when in Status Mode
     my %hostStatus = ();
     my @row = ();
+    my $separatorText;
     if (($parent==0)&&($isRecursive))
     {
         $parent=-1;
     }
+
+    if ( $sourceDB->countHostStatus($showStatus, $parent) )
+        {
+            $separatorText = $sourceDB->getPath($parent);
+            %hostStatus = ( "down"    => $sourceDB->countHostStatus(STATUS_DOWN, $parent),
+                            "alive"   => $sourceDB->countHostStatus(STATUS_ALIVE, $parent),
+                            "unknown" => $sourceDB->countHostStatus(STATUS_UNKNOWN, $parent),
+                          );
+            $separatorText .= " (".$hostStatus{"alive"};
+            $separatorText .= "/".$hostStatus{"down"};
+            $separatorText .= "/".$hostStatus{"unknown"}.")";
+            $destinationUI->addHostSeparator($separatorText);
+        }
+
     my $sth = $sourceDB->getHostList($parent, $showStatus);
-    
     # Draw hosts located in the current folder
     while (@row = $sth->fetchrow_array)
     {
@@ -85,22 +111,14 @@ sub drawHostField
         $row[11]);                         # Time of status change
     }
     $sth->finish();
-    
+
     # If a recursive mode is on walk deep in subfolders...
     if ($isRecursive)
     {
         $sth = $sourceDB->getFolderList($parent);
         while (@row = $sth->fetchrow_array)
         {
-            %hostStatus = ( "down"    => $sourceDB->countHostStatus(STATUS_DOWN, $row[0]),
-                            "alive"   => $sourceDB->countHostStatus(STATUS_ALIVE, $row[0]),
-                            "unknown" => $sourceDB->countHostStatus(STATUS_UNKNOWN, $row[0]),
-                           );
-            $row[1] .= " (".$hostStatus{"alive"};
-            $row[1] .= "/".$hostStatus{"down"};
-            $row[1] .= "/".$hostStatus{"unknown"}.")";   
-            $destinationUI->addHostSeparator($row[1]);
-            drawHostField($sourceDB, $destinationUI, $row[0], $isRecursive, $editMode);
+            drawHostField($sourceDB, $destinationUI, $row[0], $isRecursive, $editMode, $showStatus);
         }
         $sth->finish();
     }

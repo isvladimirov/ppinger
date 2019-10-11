@@ -50,30 +50,27 @@ my $db = PMySQL->new(
 my $folderId = $queryCGI->param('folder_id');
 my %host = ( 'id' => $queryCGI->param('host_id') );
 my $deleteObject = $queryCGI->param('delete');
-# my $output="Content-type: text/html\n\n";
-# $output.="<html>\n<head>\n";
-# $output.="<meta http-equiv='refresh' content='2;url=./index.pl'>\n";
-# $output.="</head>\n";
-# $output.="<body>\n";
+my $action = $queryCGI->param('action');
+my $cookie;
 
 if ($folderId eq 'New')
 {
-#     $output.="Create new folder ";
+    # Create new folder
     $db->createFolder($queryCGI->param('name'), $queryCGI->param('parent_id'));
 }
 elsif ($deleteObject eq 'folder')
 {
-#     $output.="Delete folder ";
+    # Delete folder
     $db->deleteFolder($folderId);
 }
 elsif ($folderId =~ /^\d+?$/)
 {
-#     $output.="Folder update ";
+    # Folder update
     $db->updateFolder($folderId, $queryCGI->param('name'), $queryCGI->param('parent_id'));
 }
 elsif ($host{"id"} eq 'New')
 {
-#     $output.="Create new host ";
+    # Create new host
     $host{"host"} = $queryCGI->param('host');
     $host{"parentId"} = $queryCGI->param('parent_id');
     $host{"method"} = $queryCGI->param('method');
@@ -87,12 +84,12 @@ elsif ($host{"id"} eq 'New')
 }
 elsif ($deleteObject eq 'host')
 {
-#     $output.="Delete host ";
+    # Delete host
     $db->deleteHost($host{"id"});
 }
 elsif ($host{"id"} =~ /^\d+?$/)
 {
-#     $output.="Host update ";
+    # Update host
     $host{"host"} = $queryCGI->param('host');
     $host{"parentId"} = $queryCGI->param('parent_id');
     $host{"method"} = $queryCGI->param('method');
@@ -105,27 +102,26 @@ elsif ($host{"id"} =~ /^\d+?$/)
     else {$host{"status"} = 3;}
     $db->updateHost(%host);
 }
-# else
-# {
-#     $output.="Nothing to do here ";
-# }
-# if ($db->getLastError())
-# {
-#     $output.="done with some errors!<br />\n";
-#     $output.=$db->getLastError()."<br />\n";
-# }
-# else
-# {
-#     $output.="done with no errors.<br />\n";
-# }
-#$output.="</body>\n</html>\n";
+elsif ( $action eq "edit")
+{
+    # Toggle edit mode
+    if ( $queryCGI->cookie('EDIT_MODE') )
+    {
+        # Edit mode is on. Turn it off.
+        $cookie = new CGI::Cookie(-name=>'EDIT_MODE',-value=>'0');
+    }
+    else
+    {
+        # Edit mode is off. Turn it on.
+        $cookie = new CGI::Cookie(-name=>'EDIT_MODE',-value=>'1');
+    }
+}
 
 # Close database
 $db->DESTROY();
 
-# Print message and exit
-# print $output;
-print $queryCGI->redirect("index.pl");
+if ($cookie) {print $queryCGI->redirect(-uri => "index.pl", -type=>"text/html;charset=UTF-8", -cookie=>$cookie);}
+else { print $queryCGI->redirect("index.pl"); }
 
 # End of main function
 1;

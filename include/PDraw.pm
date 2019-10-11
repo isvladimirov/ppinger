@@ -1,11 +1,24 @@
 #!/usr/bin/env perl
 
-#######################################
-# PPinger
-# PDraw.pm
-# Class for drawing user interface
-# Copyright 2018 duk3L3t0
-#######################################
+#############################################################################
+#
+#    PDraw.pm - Class for drawing user interface
+#    Copyright (C) 2018-2019 Igor Vladimirov <luiseal.mail@gmail.com>
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see http://www.gnu.org/licenses/
+#
+#############################################################################
 # Status values:
 # 0 - Show all (when it's posible)
 # 1 - Down
@@ -67,28 +80,33 @@ package PDraw
         print "</head>\n";
         print "<body id='main'>\n";
         print "<header id='pageHeader'>\n";
+        print "<ul>\n";
 
-        print "<div id='pageHeaderLeft'>\n";
+        print "<li id='pageHeaderLeft'>\n";
         print "$title<br>\n";
         print "Running on " . hostname() . "<br>\n";
         my $now_string = strftime "%a %e %b %Y %H:%M:%S", localtime;
         print "Page loaded at $now_string\n";
-        print "</div>\n";
+        print "</li>\n";
 
-        print "<div id='pageHeaderStatus'>\n";
+        print "<li id='pageHeaderStatus'>\n";
         print "Total hosts: $hostStatus{'total'}<br>\n";
-        print "<a href='./index.pl?status=2'><font color='green'>Alive: $hostStatus{'alive'}</font></a><br>\n";
-        print "<a href='./index.pl?status=1'><font color='red'>Down: $hostStatus{'down'}</font></a><br>\n";
-        print "<a href='./index.pl?status=3'><font color='orange'>Unknown: $hostStatus{'unknown'}</font></a><br>\n";
-        print "</div>\n";
+        print "<a href='./index.pl?status=2'><font color='green'>Alive:</font> $hostStatus{'alive'}</a><br>\n";
+        print "<a href='./index.pl?status=3'><font color='orange'>Unknown:</font> $hostStatus{'unknown'}</a><br>\n";
+        print "</li>\n";
 
-        print "<div id='pageHeaderRight'>\n";
+        print "<li id='pageHeaderStatusDown'>\n";
+        print "<a href='./index.pl?status=1'><font color='red'>Down:</font> $hostStatus{'down'}</a><br>\n";
+        print "</li>\n";
+
+        print "<li id='pageHeaderRight'>\n";
         print "<a href='./index.pl' id='hint' data-title='Show main page'><img width='32' src='share/home.svg' alt='Show main page'></a>\n";
         print "<a href='./index.pl?action=show_logs' id='hint' data-title='Show quick logs'><img width='32' src='share/logs.svg' alt='Show quick logs'></a>\n";
-        print "<a href='./index.pl?action=edit' id='hint' data-title='Edit mode'><img width='32' src='share/configure.svg' alt='Toggle edit mode'></a>\n";
+        print "<a href='./write.pl?action=edit' id='hint' data-title='Toggle edit mode'><img width='32' src='share/configure.svg' alt='Toggle edit mode'></a>\n";
         print "<a href='./auth.pl?action=logout' id='hint' data-title='Log out'><img width='32' src='share/logout.svg' alt='Logout'></a>\n";
-        print "</div>\n";
+        print "</li>\n";
 
+        print "</ul>\n";
         print "</header>\n";
         return 1;
     }
@@ -133,11 +151,11 @@ package PDraw
         if ($isBad) { $image = "share/folder-red.svg"; }
         for (my $i=0; $i<$level; $i++)
         {
-            $prefix.="<img width='8' src='share/level.svg' alt=''>";
+            $prefix.="<img width='16' src='share/empty.png' alt=''>";
         }
         if ($prefix)
         {
-            $prefix.="<img width='12' src='share/arrow-forward.svg' alt=''>";
+            $prefix.="<img width='16' src='share/empty.png' alt=''>";
         }
         if ($need_edit)
         {
@@ -178,12 +196,12 @@ package PDraw
             print "<th id='mainTableHeaderAdd'><a href='./index.pl?action=edit_host'>";
             print "<img width='16' src='share/fork.svg' alt='Edit this host'></a></th>\n";
         }
-        print "<th id='mainTableHeaderHost'>Host</th>\n";
+        print "<th id='mainTableHeaderCom'>Comment</th>\n";
         print "<th id='mainTableHeaderStatus'>Status</th>\n";
         print "<th id='mainTableHeaderReply'>Reply</th>\n";
         print "<th id='mainTableHeaderLTT'>Last Test Time</th>\n";
         print "<th id='mainTableHeaderLS'>Last Status</th>\n";
-        print "<th id='mainTableHeaderCom'>Comment</th>\n";
+        print "<th id='mainTableHeaderHost'>Host</th>\n";
         print "<th id='mainTableHeaderSC'>Status Changed</th>\n";
         print "</tr>\n";
         return 1;
@@ -206,17 +224,17 @@ package PDraw
             print "<img width='16' src='share/edit-text-frame-update.svg' alt='Edit this host'>";
             print "</a></td>\n";
         }
-        print "<td id='mainTableDataHost'><a href='./index.pl?action=show_host&host_id=$id'>$name</a></td>\n";
+        print "<td id='mainTableComment' onclick='window.location.href=\"index.pl?action=show_host&host_id=$id\"; return false'><a href='index.pl?action=show_host&host_id=$id'>$comment</a></td>\n";
         print "<td>$status</td>\n";
         print "<td>$reply ms</td>\n";
         print "<td>$ltt</td>\n";
         print "<td>$lastStatus</td>\n";
-        print "<td id='mainTableComment'>$comment</td>\n";
+        print "<td id='mainTableDataHost'>$name</td>\n";
         print "<td>$statusChanged</td>\n";
         print "</tr>\n";
         return 1;
     }
-    
+
     sub addHostSeparator
     {
         my($self, $title) = @_;
@@ -238,11 +256,11 @@ package PDraw
         my($self) = @_;
         print "<article id='pageHosts'>\n";
         print "<div id='showHostWholeBlock'>\n";
-        print "<div id='showHostBlockHeader'>Last 100 events</div>\n";
+        print "<div id='showHostBlockHeader'>Last 1000 events</div>\n";
         print "<ul id='showHostBlock'>\n";
         return 1;
     }
-    
+
     sub addLog
     {
         my($self, $message, $status) = @_;
@@ -461,7 +479,7 @@ package PDraw
         print "<form action='./auth.pl' method='post'>\n";
         print "<table id='login'>\n";
         print "<tr><th colspan='2'>$title</th></tr>\n";
-        print "<tr><td>Login:</td><td><input type='text' name='login'></td></tr>";
+        print "<tr><td>Login:</td><td><input type='text' name='login' autofocus></td></tr>";
         print "<tr><td>Password:</td><td><input type='password' name='password'></td></tr>";
         print "<tr><td colspan='2' align='right'><input type='submit' value='Login'></td></tr>\n";
         if ($message) { print "<tr><td colspan='2' id='login'>$message</td></tr>\n"; }

@@ -18,7 +18,7 @@ package PPoller
         my($class) = @_;
         my $self = {
             NAME => 'PPoller',
-            VERSION => '1.0',
+            VERSION => '1.1',
         };
         bless $self, $class;
         return $self;
@@ -36,18 +36,16 @@ package PPoller
         {
             case "ping"
             {
-                $p = Net::Ping->new("icmp");
-                for ($i = 0; $i<$host{"attempts"}; $i++)
+                my @stdout = `ping -f -c $host{"attempts"} -W 1 $host{"host"} | tail -n 2`;
+                ($_,$avail) = split(/,/,$stdout[0]);
+                ($avail) = split(/received/,$avail);
+                $avail =~ s/^\s+|\s+$//g;
+                if ($avail > 0)
                 {
-                    ($avail, $dur) = $p->ping($host{"host"}, $host{"timeout"}/1000);
-                    if ($avail)
-                    {
-                        $status = 1;
-                        last;
-                    }
+                    $status = 1;
                 }
-                $p->close;
-                $dur *= 1000; # Convert seconds to milliseconds
+                ($_,$_,$_,$_,$dur) = split(/\//,$stdout[1]);
+                $dur =~ s/^\s+|\s+$//g;
             }
             case "tcp"
             {

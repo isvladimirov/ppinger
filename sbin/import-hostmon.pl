@@ -31,7 +31,7 @@ my $key;
 my @folder_path;
 my $folder;
 my $folder_id = -1;
-my %host;
+my %host = ();
 
 open(InFile, '<:encoding(CP1251)',FILE) || die ("Fatal: Can't open input file");
 while($line=<InFile>)
@@ -39,24 +39,27 @@ while($line=<InFile>)
     @line_arr = split("=", $line);
     $var = trim($line_arr[0]);
     $key = trim($line_arr[1]);
-    if ($var eq "DefaultFolder")
+    if ($var eq ";DestFolder")
     {
         @folder_path = split(/\\/, $key);
         foreach $folder (@folder_path)
         {
-            # Check if the folder exists. False: create it. Get folder's ID.
-            $folder_id = $db->getFolderIdByName($folder);
-            if ($folder_id eq 0)
+            # Check if the folder exists. False: create it. Then get folder's ID.
+            if ($db->getFolderIdByName($folder) eq 0)
             {
-                print "Simulate: Creating new folder: $folder...\n";
+                print "Creating new folder $folder with id $folder_id...\n";
                 $db->createFolder($folder, $folder_id);
-                $folder_id = $db->getFolderIdByName($folder);
             }
+            $folder_id = $db->getFolderIdByName($folder);
         }
     }
     elsif ($var eq "Title")
     {
         $host{"comment"} = $key;
+    }
+    elsif ($var eq "Disabled")
+    {
+        $host{"status"} = 4;
     }
     elsif ($var eq "Host")
     {
@@ -70,8 +73,9 @@ while($line=<InFile>)
     {
         $host{"attempts"} = $key;
         $host{"parentId"} = $folder_id;
-        print "Simulate: Creating new host: ".$host{"host"}."...\n";
+        print "Creating new host: ".$host{"host"}."...\n";
         $db->createHost(%host);
+        %host = ();
     }
 }
 close(InFile);
