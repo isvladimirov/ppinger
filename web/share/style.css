@@ -86,12 +86,13 @@ li {
 #pageHosts {
     grid-area: article;
     padding: 0;
-    overflow-y: auto;
+    overflow: auto;
     -ms-grid-row: 3;
     -ms-grid-column: 3;
 }
 #mainTable {
     width: 100%;
+    min-width: 1000px;
     border: 0;
     border-spacing: 1px;
     line-height: 18px;
