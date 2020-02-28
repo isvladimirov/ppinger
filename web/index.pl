@@ -4,7 +4,7 @@
 # PPinger
 # index.pl
 # Point of entrance
-# Copyright 2018-2019 duk3L3t0
+# Copyright 2018-2020 duk3L3t0
 #######################################
 
 use CGI::Carp qw(warningsToBrowser fatalsToBrowser);
@@ -20,7 +20,7 @@ use Switch;
 use strict;
 use constant
 {
-    APP_VERSION => "1.0 (preview)",
+    APP_VERSION => "1.0",
     STATUS_ALL => 0,
     STATUS_DOWN => 1,
     STATUS_ALIVE => 2,
